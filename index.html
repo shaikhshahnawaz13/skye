@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SKYE</title>
-<link rel="icon" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 /* ═══════════════════════════════════════════
@@ -583,14 +582,99 @@ body {
   .right-card { grid-column:1/3; grid-row:2; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
   .fc-card { grid-column:1/3; }
 }
+
+/* Tablet */
 @media(max-width:720px){
-  .grid { grid-template-columns:1fr; }
-  .wx-card { grid-column:1; grid-row:1; }
-  .center-card { grid-column:1; grid-row:2; }
-  .right-card { grid-column:1; grid-row:3; display:flex; }
-  .fc-card { grid-column:1; grid-row:4; }
-  .app { padding:14px; }
-  .topbar { padding:12px 18px; }
+  .grid { grid-template-columns:1fr; gap:10px; }
+  .wx-card,.center-card,.right-card,.fc-card {
+    grid-column:1 !important; grid-row:auto !important;
+  }
+  .right-card { display:flex; flex-direction:column; }
+  .app { padding:10px; gap:10px; }
+  .topbar { padding:10px 14px; gap:10px; }
+  .t-srch { max-width:none; }
+}
+
+/* Mobile — full proper fix */
+@media(max-width:480px){
+  body { overflow-x:hidden; }
+  .app { padding:8px; gap:8px; }
+
+  /* Hide cursor ring on touch */
+  #cur,#cur2 { display:none; }
+
+  /* Topbar — stack search below logo */
+  .topbar {
+    flex-wrap:wrap;
+    padding:10px 12px;
+    gap:8px;
+    height:auto;
+  }
+  .t-sep { display:none; }
+  .t-srch {
+    order:3; flex:none; width:100%;
+    max-width:none; margin-left:0;
+  }
+  .t-time { margin-left:auto; }
+
+  /* Grid — strict single column */
+  .grid {
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .wx-card,.center-card,.right-card,.fc-card {
+    grid-column:1 !important;
+    grid-row:auto !important;
+    width:100%;
+  }
+
+  /* Weather card */
+  .wx-card { padding:22px 18px; }
+  .wx-city { font-size:16px; }
+  .wx-tmp { font-size:72px; letter-spacing:-4px; }
+  .wx-chips { gap:6px; }
+  .chip { padding:6px 11px; font-size:11px; }
+
+  /* Center orb card — compact */
+  .center-card { padding:22px 18px; gap:14px; }
+  .cc-orb {
+    width:160px; height:160px;
+  }
+  .cc-big-tmp { font-size:52px; letter-spacing:-3px; }
+  .cc-sun-row { max-width:100%; }
+  .cc-sun-item { padding:10px 12px; }
+  .cc-meta-row { max-width:100%; }
+  .cc-gauge-wrap { max-width:100%; }
+
+  /* Right card */
+  .right-card {
+    padding:20px 18px;
+    display:flex; flex-direction:column; gap:0;
+  }
+  .detail-pair { grid-template-columns:1fr 1fr; }
+
+  /* Forecast */
+  .fc-card { padding:18px 14px; }
+  .fc-row { gap:6px; overflow-x:auto; padding-bottom:4px; }
+  .fc-item { min-width:68px; padding:14px 8px; }
+  .fc-hi { font-size:14px; }
+
+  /* Init overlay */
+  .init-logo { font-size:clamp(48px,14vw,80px); letter-spacing:-4px; }
+  .init-srch { padding:6px 6px 6px 16px; }
+  .init-srch input { font-size:13px; }
+  .btn-neu { padding:8px 18px; font-size:11px; }
+
+  /* Wave */
+  .wave-days { flex-wrap:wrap; gap:2px; }
+  .wd { flex:1; min-width:40px; }
+
+  /* MMF strip */
+  .mmf { padding-top:18px; }
+  .mmf-v { font-size:17px; }
+
+  /* Toast */
+  .toast { width:88vw; white-space:normal; text-align:center; font-size:11px; }
 }
 </style>
 </head>
