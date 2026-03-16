@@ -1,1205 +1,1065 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OtakuVault</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SKYE</title>
 <link rel="icon" href="favicon.png">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#080810;--bg2:#0f0f1a;--bg3:#16162a;--bg4:#1e1e35;--accent:#e63946;--accent2:#f4a261;--purple:#7c3aed;--blue:#2563eb;--green:#16a34a;--text:#eeeef5;--muted:#7777a0;--border:rgba(255,255,255,0.07);}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden;}
-a{color:inherit;text-decoration:none;}
-button{cursor:pointer;font-family:'Nunito',sans-serif;}
-input,textarea{font-family:'Nunito',sans-serif;}
+/* ═══════════════════════════════════════════
+   NEUMORPHISM DESIGN SYSTEM
+   
+   Core idea: one background color, elements
+   appear raised or pressed using two shadows —
+   light from top-left, dark from bottom-right.
+   
+   No gradients on cards. No cartoon elements.
+   Pure tactile softness.
+═══════════════════════════════════════════ */
+:root {
+  /* base surface — all elements match this */
+  --bg:      #e8eef6;
+  --bg-d:    #d1dae6;   /* darker shadow */
+  --bg-l:    #ffffff;   /* lighter highlight */
 
-/* SCROLLBAR */
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:var(--bg);}
-::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+  /* neumorphic shadows (the magic) */
+  --neu-out: 
+    6px 6px 14px var(--bg-d),
+    -6px -6px 14px var(--bg-l);
+  --neu-out-md:
+    10px 10px 24px var(--bg-d),
+    -10px -10px 24px var(--bg-l);
+  --neu-out-lg:
+    16px 16px 36px var(--bg-d),
+    -16px -16px 36px var(--bg-l);
+  --neu-in:
+    inset 4px 4px 10px var(--bg-d),
+    inset -4px -4px 10px var(--bg-l);
+  --neu-in-md:
+    inset 6px 6px 16px var(--bg-d),
+    inset -6px -6px 16px var(--bg-l);
 
-/* AUTH */
-#auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem;}
-.auth-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:420px;}
-.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--accent);letter-spacing:4px;text-align:center;margin-bottom:0.3rem;}
-.auth-logo span{color:var(--text);}
-.auth-sub{text-align:center;color:var(--muted);font-size:0.85rem;margin-bottom:2rem;}
-.auth-tabs{display:flex;background:var(--bg3);border-radius:10px;padding:3px;margin-bottom:1.5rem;}
-.auth-tab{flex:1;border:none;background:none;color:var(--muted);font-weight:700;font-size:0.88rem;padding:0.5rem;border-radius:8px;transition:all 0.2s;}
-.auth-tab.active{background:var(--accent);color:#fff;}
-.field{margin-bottom:1rem;}
-.field label{display:block;font-size:0.78rem;font-weight:700;color:var(--muted);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:1px;}
-.field input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;padding:0.65rem 0.9rem;outline:none;transition:border-color 0.2s;}
-.field input:focus{border-color:rgba(230,57,70,0.5);}
-.field input::placeholder{color:var(--muted);}
-.btn-full{width:100%;background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:0.95rem;font-weight:800;padding:0.75rem;transition:all 0.2s;margin-top:0.5rem;}
-.btn-full:hover{background:#c1121f;transform:translateY(-1px);}
-.auth-err{background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:#ff6b6b;font-size:0.83rem;padding:0.6rem 0.9rem;margin-bottom:1rem;display:none;}
-.auth-err.show{display:block;}
+  /* accent — one color only, used sparingly */
+  --accent:  #4a90d9;
+  --acc-l:   #72aee8;
+  --acc-d:   #2e6cb0;
 
-/* HEADER */
-#app{display:none;}
-header{position:sticky;top:0;z-index:100;background:rgba(8,8,16,0.97);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:58px;gap:1rem;}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:var(--accent);letter-spacing:3px;white-space:nowrap;}
-.logo span{color:var(--text);}
-nav{display:flex;gap:0.2rem;}
-.nav-btn{background:none;border:none;color:var(--muted);font-size:0.82rem;font-weight:700;padding:0.4rem 0.8rem;border-radius:8px;transition:all 0.2s;white-space:nowrap;}
-.nav-btn:hover{color:var(--text);background:var(--bg3);}
-.nav-btn.active{color:var(--accent);background:rgba(230,57,70,0.1);}
-.header-right{display:flex;align-items:center;gap:0.8rem;}
-.qs-wrap{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:0.35rem 0.8rem;gap:0.4rem;width:180px;transition:border-color 0.2s;}
-.qs-wrap:focus-within{border-color:rgba(230,57,70,0.4);}
-.qs-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:0.82rem;width:100%;}
-.qs-wrap input::placeholder{color:var(--muted);}
-.user-chip{display:flex;align-items:center;gap:0.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:0.3rem 0.8rem 0.3rem 0.3rem;cursor:pointer;transition:border-color 0.2s;}
-.user-chip:hover{border-color:var(--accent);}
-.avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;background:var(--accent);color:#fff;flex-shrink:0;overflow:hidden;}
-.avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.user-chip span{font-size:0.8rem;font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  /* text */
+  --t1: #1a2a3a;
+  --t2: #5a7290;
+  --t3: #8aa0b8;
 
-/* MAIN */
-main{max-width:1300px;margin:0 auto;padding:2rem 1.5rem;}
-.page{display:none;}
-.page.active{display:block;}
+  --r: 20px;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+  --spring: cubic-bezier(0.34,1.56,0.64,1);
+}
 
-/* SECTION TITLE */
-.sec-title{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:2px;margin-bottom:1.2rem;display:flex;align-items:center;gap:0.6rem;}
-.sec-title::before{content:'';display:block;width:4px;height:1.5rem;background:var(--accent);border-radius:2px;}
+/* Weather accent colors — subtle, not background */
+body.wx-clear        { --accent:#e8a020; --acc-l:#f0bc50; --acc-d:#c07810; }
+body.wx-clouds       { --accent:#6a8aaa; --acc-l:#8aaccb; --acc-d:#4a6a8a; }
+body.wx-rain         { --accent:#3a78b8; --acc-l:#5a98d8; --acc-d:#1a5898; }
+body.wx-thunderstorm { --accent:#5a4a9a; --acc-l:#7a6aba; --acc-d:#3a2a7a; }
+body.wx-snow         { --accent:#7ab8e8; --acc-l:#9ad0f8; --acc-d:#5a98c8; }
+body.wx-mist         { --accent:#7a9ab0; --acc-l:#9ab8cc; --acc-d:#5a7a90; }
 
-/* ANIME GRID */
-.anime-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:1.1rem;}
-.anime-card{border-radius:10px;overflow:hidden;background:var(--bg2);border:1px solid var(--border);transition:transform 0.2s,border-color 0.2s;cursor:pointer;position:relative;}
-.anime-card:hover{transform:translateY(-4px);border-color:rgba(230,57,70,0.5);}
-.anime-card img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:var(--bg3);}
-.card-body{padding:0.6rem 0.65rem 0.65rem;}
-.card-title{font-size:0.78rem;font-weight:700;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.card-meta{display:flex;align-items:center;justify-content:space-between;margin-top:0.3rem;}
-.score-pill{background:rgba(244,162,97,0.12);color:var(--accent2);font-size:0.7rem;font-weight:700;padding:0.15rem 0.4rem;border-radius:4px;}
-.type-lbl{color:var(--muted);font-size:0.68rem;}
-.list-tag{position:absolute;top:6px;left:6px;font-size:0.6rem;font-weight:800;padding:0.18rem 0.45rem;border-radius:4px;text-transform:uppercase;letter-spacing:0.5px;}
-.tag-w{background:#2563eb;color:#fff;}
-.tag-c{background:#16a34a;color:#fff;}
-.tag-p{background:#7c3aed;color:#fff;}
+/* Night mode */
+body.wx-night {
+  --bg:    #1e2836;
+  --bg-d:  #141c28;
+  --bg-l:  #28364a;
+  --t1: rgba(255,255,255,.90);
+  --t2: rgba(255,255,255,.50);
+  --t3: rgba(255,255,255,.28);
+}
 
-/* SKELETON */
-.skel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:1.1rem;}
-.skel-card{border-radius:10px;background:var(--bg2);}
-.skel-img{aspect-ratio:2/3;background:var(--bg3);animation:shimmer 1.4s infinite;background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200%;}
-.skel-line{height:10px;margin:0.6rem 0.65rem 0.3rem;border-radius:4px;background:var(--bg3);}
-.skel-line2{height:9px;width:50%;margin:0 0.65rem 0.65rem;border-radius:4px;background:var(--bg3);}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html,body { height:100%; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--t1);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  cursor: none;
+  transition: background .8s var(--ease), color .8s;
+}
 
-/* TABS */
-.tab-row{display:flex;gap:0.4rem;margin-bottom:1.2rem;flex-wrap:wrap;}
-.tab-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:0.8rem;font-weight:700;padding:0.3rem 0.9rem;transition:all 0.2s;}
-.tab-btn:hover{color:var(--text);}
-.tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+/* ─── CURSOR ────────────────────────── */
+#cur {
+  position:fixed; z-index:9999; pointer-events:none;
+  width:9px; height:9px; border-radius:50%;
+  background: var(--accent);
+  transform:translate(-50%,-50%);
+  transition: width .2s var(--spring), height .2s var(--spring), background .6s;
+  box-shadow: 0 0 10px var(--acc-l);
+}
+#cur.big { width:14px; height:14px; }
+#cur2 {
+  position:fixed; z-index:9998; pointer-events:none;
+  width:32px; height:32px; border-radius:50%;
+  border:1.5px solid var(--t3);
+  transform:translate(-50%,-50%);
+  transition: left .1s var(--ease), top .1s var(--ease), width .3s var(--spring), height .3s var(--spring), border-color .5s;
+}
+#cur2.xl { width:46px; height:46px; border-color:var(--accent); }
 
-/* SEARCH PAGE */
-.search-row{display:flex;gap:0.8rem;margin-bottom:1.5rem;}
-.big-search{flex:1;max-width:500px;display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:0.6rem 1rem;gap:0.6rem;transition:border-color 0.2s;}
-.big-search:focus-within{border-color:rgba(230,57,70,0.5);}
-.big-search input{background:none;border:none;outline:none;color:var(--text);font-size:0.95rem;width:100%;}
-.big-search input::placeholder{color:var(--muted);}
-.btn-accent{background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:0.88rem;font-weight:800;padding:0.65rem 1.4rem;transition:all 0.2s;}
-.btn-accent:hover{background:#c1121f;transform:translateY(-1px);}
+/* ─── NEU COMPONENTS ────────────────── */
 
-/* MY LIST */
-.list-entry{display:flex;gap:1rem;align-items:center;padding:0.8rem;border-radius:10px;background:var(--bg2);border:1px solid var(--border);margin-bottom:0.6rem;cursor:pointer;transition:border-color 0.2s;}
-.list-entry:hover{border-color:rgba(230,57,70,0.4);}
-.list-entry img{width:46px;height:64px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--bg3);}
-.entry-info{flex:1;min-width:0;}
-.entry-title{font-weight:700;font-size:0.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.entry-meta{display:flex;gap:0.5rem;align-items:center;margin-top:0.2rem;flex-wrap:wrap;}
-.entry-review{font-size:0.75rem;color:var(--muted);margin-top:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic;}
+/* Raised surface */
+.neu {
+  background: var(--bg);
+  box-shadow: var(--neu-out-md);
+  border-radius: var(--r);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
 
-/* THREADS */
-.thread-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;margin-bottom:0.8rem;cursor:pointer;transition:border-color 0.2s;}
-.thread-card:hover{border-color:rgba(230,57,70,0.4);}
-.thread-header{display:flex;align-items:flex-start;justify-content:space-between;gap:0.8rem;margin-bottom:0.5rem;}
-.thread-title{font-weight:800;font-size:0.95rem;line-height:1.4;}
-.thread-anime-tag{background:rgba(230,57,70,0.1);color:var(--accent);font-size:0.72rem;font-weight:700;padding:0.2rem 0.55rem;border-radius:20px;white-space:nowrap;flex-shrink:0;}
-.thread-body{font-size:0.83rem;color:var(--muted);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:0.6rem;}
-.thread-footer{display:flex;align-items:center;gap:1rem;}
-.meta-chip{display:flex;align-items:center;gap:0.3rem;font-size:0.75rem;color:var(--muted);}
-.upvote-btn{display:flex;align-items:center;gap:0.3rem;font-size:0.75rem;font-weight:700;color:var(--muted);background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.2rem 0.6rem;transition:all 0.2s;}
-.upvote-btn:hover,.upvote-btn.voted{color:var(--accent2);border-color:rgba(244,162,97,0.4);}
-.new-thread-btn{background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:0.88rem;font-weight:800;padding:0.6rem 1.2rem;transition:all 0.2s;margin-bottom:1.2rem;}
-.new-thread-btn:hover{background:#c1121f;}
+/* Pressed inward (for inputs, inactive states) */
+.neu-in {
+  background: var(--bg);
+  box-shadow: var(--neu-in-md);
+  border-radius: var(--r);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
 
-/* THREAD DETAIL */
-#thread-detail{display:none;}
-.back-btn{display:flex;align-items:center;gap:0.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:0.85rem;font-weight:700;padding:0.45rem 0.9rem;margin-bottom:1.2rem;transition:all 0.2s;width:fit-content;}
-.back-btn:hover{color:var(--text);border-color:var(--muted);}
-.thread-detail-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.3rem;margin-bottom:1.2rem;}
-.td-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;margin-bottom:0.4rem;}
-.td-body{font-size:0.9rem;color:var(--muted);line-height:1.65;margin-bottom:0.8rem;}
-.reply-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;width:100%;padding:0.7rem 0.9rem;color:var(--text);font-size:0.88rem;resize:vertical;min-height:80px;outline:none;transition:border-color 0.2s;margin-bottom:0.7rem;}
-.reply-box:focus{border-color:rgba(230,57,70,0.5);}
-.reply-box::placeholder{color:var(--muted);}
-.reply-entry{border-left:2px solid var(--bg4);padding:0.7rem 0 0.7rem 1rem;margin-bottom:0.7rem;}
-.reply-user{font-size:0.78rem;font-weight:700;color:var(--accent2);margin-bottom:0.3rem;}
-.reply-text{font-size:0.85rem;color:var(--muted);line-height:1.6;}
+/* Flat (no shadow, for nested elements) */
+.neu-flat {
+  background: var(--bg);
+  border-radius: 12px;
+  transition: background .8s;
+}
 
-/* TRENDING STATS */
-.trend-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.8rem;margin-bottom:1.5rem;}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;}
-.stat-label{font-size:0.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.3rem;}
-.stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:1px;}
+/* ─── INIT OVERLAY ──────────────────── */
+.init {
+  position:fixed; inset:0; z-index:400;
+  background: var(--bg);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+  transition: opacity .7s var(--ease);
+}
+.init.gone { opacity:0; pointer-events:none; }
 
-/* MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:200;align-items:center;justify-content:center;padding:1rem;}
-.overlay.open{display:flex;}
-.modal{background:var(--bg2);border:1px solid rgba(255,255,255,0.09);border-radius:16px;max-width:660px;width:100%;max-height:92vh;overflow-y:auto;}
-.modal-top{display:flex;gap:1.3rem;padding:1.4rem;}
-.modal-poster{width:120px;min-width:120px;border-radius:8px;overflow:hidden;align-self:flex-start;}
-.modal-poster img{width:100%;display:block;background:var(--bg3);}
-.modal-info{flex:1;}
-.m-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;line-height:1.1;}
-.m-title-en{font-size:0.8rem;color:var(--muted);margin:0.2rem 0 0.6rem;}
-.m-pills{display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.7rem;}
-.mpill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:0.73rem;font-weight:600;padding:0.18rem 0.55rem;color:var(--muted);}
-.mpill.gold{color:var(--accent2);border-color:rgba(244,162,97,0.2);background:rgba(244,162,97,0.06);}
-.m-synopsis{font-size:0.83rem;line-height:1.65;color:var(--muted);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;}
-.modal-bottom{padding:1.1rem 1.4rem 1.4rem;border-top:1px solid var(--border);}
-.mlabel{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin:1rem 0 0.5rem;}
-.mlabel:first-child{margin-top:0;}
-.status-row{display:flex;gap:0.5rem;flex-wrap:wrap;}
-.sbtn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:0.8rem;font-weight:700;padding:0.4rem 0.9rem;transition:all 0.2s;}
-.sbtn:hover{color:var(--text);}
-.sbtn.sw{background:rgba(37,99,235,0.15);border-color:#2563eb;color:#60a5fa;}
-.sbtn.sc{background:rgba(22,163,74,0.15);border-color:#16a34a;color:#4ade80;}
-.sbtn.sp{background:rgba(124,58,237,0.15);border-color:#7c3aed;color:#a78bfa;}
-.star-row{display:flex;gap:0.2rem;}
-.star{font-size:1.4rem;cursor:pointer;color:rgba(255,255,255,0.12);transition:color 0.1s;user-select:none;line-height:1;}
-.star.lit{color:var(--accent2);}
-textarea.review-ta{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.86rem;padding:0.65rem 0.9rem;resize:vertical;min-height:75px;outline:none;transition:border-color 0.2s;}
-textarea.review-ta:focus{border-color:rgba(230,57,70,0.5);}
-textarea.review-ta::placeholder{color:var(--muted);}
-.anon-row{display:flex;align-items:center;gap:0.5rem;margin-top:0.6rem;}
-.anon-row label{font-size:0.82rem;color:var(--muted);}
-.toggle{width:34px;height:18px;background:var(--bg4);border-radius:9px;border:1px solid var(--border);cursor:pointer;position:relative;transition:background 0.2s;}
-.toggle.on{background:var(--accent);}
-.toggle::after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left 0.2s;}
-.toggle.on::after{left:18px;}
-.action-row{display:flex;gap:0.6rem;justify-content:flex-end;margin-top:1rem;}
-.btn-ghost{background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:0.85rem;font-weight:700;padding:0.5rem 1.1rem;transition:all 0.2s;}
-.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
-.btn-save{background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:0.85rem;font-weight:800;padding:0.5rem 1.3rem;transition:all 0.2s;}
-.btn-save:hover{background:#c1121f;transform:translateY(-1px);}
+.init-logo {
+  font-size: clamp(64px,14vw,120px);
+  font-weight:900; letter-spacing:-6px; line-height:1;
+  color: var(--t1);
+  text-shadow: var(--neu-out-lg);
+  transition: color .8s, text-shadow .8s;
+}
+.init-sub {
+  font-size:11px; font-weight:400;
+  letter-spacing:5px; text-transform:uppercase;
+  color: var(--t3); margin-bottom:8px;
+}
 
-/* COMMUNITY REVIEWS */
-.reviews-section{margin-top:1.2rem;border-top:1px solid var(--border);padding-top:1rem;}
-.review-card{background:var(--bg3);border-radius:8px;padding:0.8rem;margin-bottom:0.6rem;}
-.rv-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;}
-.rv-user{font-size:0.78rem;font-weight:700;color:var(--accent2);}
-.rv-stars{font-size:0.8rem;color:var(--accent2);}
-.rv-text{font-size:0.82rem;color:var(--muted);line-height:1.55;}
-.rv-anon{color:var(--muted)!important;font-style:italic;}
+/* Neumorphic search bar */
+.init-srch {
+  display:flex; align-items:center; gap:10px;
+  width:min(440px,88vw);
+  padding:8px 8px 8px 22px;
+  border-radius:50px;
+  box-shadow: var(--neu-in-md);
+  background: var(--bg);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
+.init-srch:focus-within {
+  box-shadow:
+    inset 6px 6px 14px var(--bg-d),
+    inset -6px -6px 14px var(--bg-l),
+    0 0 0 2px var(--accent);
+}
+.init-srch input {
+  flex:1; background:transparent; border:none; outline:none;
+  font-family:'Inter',sans-serif; font-size:14px; font-weight:300;
+  color:var(--t1); cursor:text;
+}
+.init-srch input::placeholder { color:var(--t3); }
 
-/* EMPTY */
-.empty{text-align:center;padding:3.5rem 1rem;color:var(--muted);}
-.empty-icon{font-size:3rem;margin-bottom:0.8rem;}
-.empty h3{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:0.3rem;}
+/* Neumorphic buttons */
+.btn-neu {
+  background: var(--bg);
+  box-shadow: var(--neu-out);
+  border:none; border-radius:50px;
+  padding:10px 24px;
+  font-family:'Inter',sans-serif;
+  font-size:12px; font-weight:600; letter-spacing:.8px;
+  color: var(--accent); cursor:none;
+  transition: box-shadow .2s var(--ease), transform .25s var(--spring), color .6s, background .8s;
+  white-space:nowrap;
+}
+.btn-neu:hover {
+  box-shadow: var(--neu-out-md);
+  transform: scale(1.04);
+}
+.btn-neu:active {
+  box-shadow: var(--neu-in);
+  transform: scale(.97);
+}
 
-/* MODAL NEW THREAD */
-.form-field{margin-bottom:0.9rem;}
-.form-field label{display:block;font-size:0.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.4rem;}
-.form-field input,.form-field textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;padding:0.6rem 0.9rem;outline:none;transition:border-color 0.2s;}
-.form-field input:focus,.form-field textarea:focus{border-color:rgba(230,57,70,0.5);}
-.form-field input::placeholder,.form-field textarea::placeholder{color:var(--muted);}
-.form-field textarea{resize:vertical;min-height:90px;}
+.btn-ico {
+  background: var(--bg);
+  box-shadow: var(--neu-out);
+  border:none; border-radius:50%;
+  width:38px; height:38px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px; cursor:none; flex-shrink:0;
+  transition: box-shadow .2s var(--ease), transform .25s var(--spring), background .8s;
+}
+.btn-ico:hover { box-shadow: var(--neu-out-md); transform:scale(1.1); }
+.btn-ico:active { box-shadow: var(--neu-in); }
 
-/* TOAST */
-.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg3);border:1px solid var(--accent);border-radius:8px;color:var(--text);font-size:0.83rem;font-weight:600;padding:0.65rem 1.1rem;z-index:999;opacity:0;transform:translateY(6px);transition:all 0.3s;pointer-events:none;}
-.toast.show{opacity:1;transform:translateY(0);}
+.ispin {
+  display:none; width:22px; height:22px;
+  border:2px solid var(--bg-d); border-top-color:var(--accent);
+  border-radius:50%; animation:sp .65s linear infinite;
+}
+@keyframes sp { to { transform:rotate(360deg); } }
 
-/* ADMIN */
-.admin-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
-.admin-table th{background:var(--bg3);color:var(--muted);font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:0.6rem 0.8rem;text-align:left;border-bottom:1px solid var(--border);}
-.admin-table td{padding:0.55rem 0.8rem;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.admin-table tr:hover td{background:var(--bg3);}
-.admin-tabs{display:flex;gap:0.4rem;margin-bottom:1.2rem;}
-.export-btn{display:flex;align-items:center;gap:0.5rem;background:#16a34a;border:none;border-radius:8px;color:#fff;font-family:Nunito,sans-serif;font-size:0.85rem;font-weight:800;padding:0.55rem 1.2rem;cursor:pointer;transition:all 0.2s;margin-bottom:1.2rem;}
-.export-btn:hover{background:#15803d;transform:translateY(-1px);}
-.admin-stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.7rem;margin-bottom:1.5rem;}
-.admin-stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;}
-.admin-stat-label{font-size:0.68rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.25rem;}
-.admin-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:1px;}
-.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);}
-/* PROFILE */
-.profile-header{display:flex;align-items:flex-end;gap:1.5rem;margin-bottom:2rem;flex-wrap:wrap;}
-.pfp-wrap{position:relative;flex-shrink:0;}
-.pfp-big{width:96px;height:96px;border-radius:50%;object-fit:cover;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:#fff;border:3px solid var(--bg3);}
-.pfp-big img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
-.pfp-edit-btn{position:absolute;bottom:2px;right:2px;width:26px;height:26px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.7rem;transition:transform 0.2s;}
-.pfp-edit-btn:hover{transform:scale(1.15);}
-.pfp-edit-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border-radius:50%;}
-.profile-info{flex:1;}
-.profile-username{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;line-height:1;}
-.profile-username-lock{font-size:0.72rem;color:var(--muted);margin-top:0.2rem;display:flex;align-items:center;gap:0.3rem;}
-.profile-bio-wrap{margin-top:0.6rem;display:flex;align-items:center;gap:0.6rem;}
-.profile-bio-input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Nunito',sans-serif;font-size:0.88rem;padding:0.45rem 0.8rem;outline:none;transition:border-color 0.2s;flex:1;max-width:360px;}
-.profile-bio-input:focus{border-color:rgba(230,57,70,0.5);}
-.profile-bio-input::placeholder{color:var(--muted);}
-.profile-stats-row{display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap;}
-.p-stat{text-align:center;}
-.p-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;color:var(--accent);}
-.p-stat-lbl{font-size:0.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;}
-.pfp-uploading{opacity:0.5;pointer-events:none;}
-/* RESPONSIVE */
-@media(max-width:640px){
-  header{padding:0 1rem;}
-  .logo{font-size:1.3rem;}
-  .nav-btn .nl{display:none;}
-  .qs-wrap{width:120px;}
-  main{padding:1rem;}
-  .modal-top{flex-direction:column;}
-  .modal-poster{width:100%;max-width:180px;}
+/* ─── APP SHELL ─────────────────────── */
+.app {
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  padding:20px;
+  gap:14px;
+  max-width:1400px;
+  margin:0 auto;
+}
+
+/* ─── TOPBAR ────────────────────────── */
+.topbar {
+  display:flex; align-items:center; gap:16px;
+  padding:14px 28px;
+}
+.t-logo {
+  font-size:13px; font-weight:800; letter-spacing:7px; text-transform:uppercase;
+  color:var(--accent); transition:color .6s;
+  flex-shrink:0;
+}
+.t-sep { width:1px; height:22px; background:var(--bg-d); flex-shrink:0; }
+
+/* inline search (neumorphic) */
+.t-srch {
+  flex:1; max-width:360px; margin-left:auto;
+  display:flex; align-items:center; gap:8px;
+  padding:7px 7px 7px 18px; border-radius:50px;
+  box-shadow: var(--neu-in);
+  background: var(--bg);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
+.t-srch:focus-within {
+  box-shadow:
+    inset 5px 5px 12px var(--bg-d),
+    inset -5px -5px 12px var(--bg-l),
+    0 0 0 2px var(--accent);
+}
+.t-srch input {
+  flex:1; background:transparent; border:none; outline:none;
+  font-family:'Inter',sans-serif; font-size:13px; font-weight:300;
+  color:var(--t1); cursor:text; min-width:0;
+}
+.t-srch input::placeholder { color:var(--t3); }
+.tspin { display:none; width:18px; height:18px; border:1.5px solid var(--bg-d); border-top-color:var(--accent); border-radius:50%; animation:sp .65s linear infinite; flex-shrink:0; }
+
+.t-time {
+  flex-shrink:0; text-align:right; line-height:1.3;
+  padding-left:18px; border-left:1px solid var(--bg-d);
+}
+.t-hm { font-size:16px; font-weight:700; letter-spacing:-.5px; color:var(--t1); }
+.t-dt { font-size:10px; font-weight:300; color:var(--t3); margin-top:1px; }
+
+/* Live dot */
+.ldot {
+  width:8px; height:8px; border-radius:50%; flex-shrink:0;
+  background:var(--accent);
+  box-shadow:0 0 8px var(--acc-l);
+  animation:ldot 2.6s ease-in-out infinite;
+  transition:background .6s, box-shadow .6s;
+}
+@keyframes ldot { 50%{opacity:.3;transform:scale(.6);} }
+
+/* ─── MAIN GRID ─────────────────────── */
+.grid {
+  flex:1;
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap:14px;
+}
+
+/* ─── WEATHER CARD (left, spans 2 rows) */
+.wx-card {
+  grid-column:1;
+  grid-row:1/3;
+  padding:32px 30px;
+  display:flex; flex-direction:column;
+  gap:0; position:relative; overflow:hidden;
+}
+
+/* Subtle accent glow inside card — neumorphic inner highlight */
+.wx-card::before {
+  content:'';
+  position:absolute; top:20px; right:20px;
+  width:80px; height:80px; border-radius:50%;
+  background:radial-gradient(circle,var(--acc-l) 0%,transparent 70%);
+  opacity:.12; pointer-events:none;
+  transition:background .6s;
+}
+
+.wx-loc { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.wx-city { font-size:18px; font-weight:700; letter-spacing:-.4px; color:var(--t1); }
+.wx-cc {
+  font-size:8px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--accent); padding:3px 9px; border-radius:6px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  transition:color .6s, box-shadow .6s, background .8s;
+}
+.wx-when { font-size:11px; font-weight:300; color:var(--t3); margin-bottom:28px; }
+
+/* Giant temp — neumorphic text shadow trick */
+.wx-big {
+  display:flex; align-items:flex-start; line-height:1;
+}
+.wx-tmp {
+  font-size:clamp(80px,10vw,110px);
+  font-weight:900; letter-spacing:-6px; line-height:.88;
+  color:var(--t1);
+  transition:color .8s;
+}
+.wx-unit {
+  font-size:26px; font-weight:200; color:var(--t3);
+  padding-top:12px; letter-spacing:0;
+  transition:color .8s;
+}
+
+/* Condition row */
+.wx-cond {
+  display:flex; align-items:center; gap:12px; margin-top:16px;
+}
+/* Neumorphic icon circle */
+.wx-ico-wrap {
+  width:48px; height:48px; border-radius:50%;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  transition:box-shadow .6s, background .8s;
+}
+.wx-ico { width:32px; height:32px; }
+.wx-desc { font-size:16px; font-weight:400; color:var(--t2); text-transform:capitalize; transition:color .8s; }
+.wx-feels { font-size:11px; font-weight:300; color:var(--t3); margin-top:5px; }
+
+/* Stat pills — neumorphic */
+.wx-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; }
+.chip {
+  display:flex; align-items:center; gap:7px;
+  padding:8px 14px; border-radius:50px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  font-size:12px; font-weight:500; color:var(--t2);
+  cursor:default;
+  transition:box-shadow .2s var(--ease), transform .25s var(--spring), background .8s, color .8s;
+}
+.chip:hover { box-shadow: var(--neu-out-md); transform:translateY(-2px); }
+.chip:active { box-shadow: var(--neu-in); transform:scale(.97); }
+.ch-i { display:flex; align-items:center; color:var(--accent); transition:color .6s; }
+
+/* Min/Feel/Max strip — neumorphic inset */
+.mmf {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  margin-top:auto; padding-top:24px;
+  border-top:1px solid var(--bg-d);
+}
+.mmf-i { display:flex; flex-direction:column; gap:4px; }
+.mmf-i:nth-child(2) { align-items:center; }
+.mmf-i:nth-child(3) { align-items:flex-end; }
+.mmf-v { font-size:20px; font-weight:700; letter-spacing:-1px; color:var(--t1); transition:color .8s; }
+.mmf-l { font-size:8px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--t3); }
+
+/* ─── CENTER — LARGE DISPLAY ────────── */
+.center-card {
+  grid-column:2;
+  grid-row:1/3;
+  padding:36px 32px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:20px; text-align:center;
+}
+
+/* Huge centered temp with neumorphic circle behind */
+.cc-orb {
+  width:min(240px,26vw); height:min(240px,26vw);
+  border-radius:50%;
+  box-shadow:
+    18px 18px 40px var(--bg-d),
+    -18px -18px 40px var(--bg-l),
+    inset 4px 4px 12px var(--bg-d),
+    inset -4px -4px 12px var(--bg-l);
+  background:var(--bg);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:0; flex-shrink:0;
+  transition:box-shadow .6s var(--ease), background .8s;
+  animation:orbpulse 4s ease-in-out infinite;
+}
+@keyframes orbpulse {
+  0%,100% { box-shadow: 18px 18px 40px var(--bg-d), -18px -18px 40px var(--bg-l), inset 4px 4px 12px var(--bg-d), inset -4px -4px 12px var(--bg-l); }
+  50%     { box-shadow: 22px 22px 48px var(--bg-d), -22px -22px 48px var(--bg-l), inset 3px 3px 9px var(--bg-d), inset -3px -3px 9px var(--bg-l); }
+}
+.cc-big-tmp {
+  font-size:clamp(56px,8vw,92px);
+  font-weight:900; letter-spacing:-5px; line-height:.9;
+  color:var(--accent); transition:color .6s;
+}
+.cc-unit { font-size:22px; font-weight:200; color:var(--t3); margin-top:4px; }
+
+/* Accent label */
+.cc-label {
+  font-size:10px; font-weight:700; letter-spacing:4px; text-transform:uppercase;
+  color:var(--accent); transition:color .6s;
+}
+
+/* Neumorphic gauge bar */
+.cc-gauge-wrap {
+  width:100%; max-width:260px;
+}
+.cc-gauge-lbl {
+  display:flex; justify-content:space-between;
+  font-size:9px; font-weight:600; letter-spacing:2px;
+  text-transform:uppercase; color:var(--t3); margin-bottom:6px;
+}
+.cc-gauge-track {
+  height:6px; border-radius:6px;
+  box-shadow: var(--neu-in);
+  background:var(--bg); overflow:hidden;
+  transition:box-shadow .6s, background .8s;
+}
+.cc-gauge-fill {
+  height:100%; border-radius:6px;
+  background:linear-gradient(90deg,var(--acc-l),var(--accent));
+  transition:width 1.2s var(--ease), background .6s;
+}
+
+/* Sun/Moon rise set */
+.cc-sun-row {
+  display:flex; gap:16px; width:100%; max-width:280px;
+}
+.cc-sun-item {
+  flex:1; padding:14px 16px; border-radius:16px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; flex-direction:column; gap:4px;
+  align-items:center;
+  transition:box-shadow .6s, background .8s;
+}
+.csi-ico { font-size:20px; }
+.csi-lbl { font-size:8px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.csi-val { font-size:13px; font-weight:600; color:var(--t1); letter-spacing:-.3px; }
+
+/* UV + wind dir display */
+.cc-meta-row {
+  display:flex; gap:12px; width:100%; max-width:280px;
+}
+.cc-meta-item {
+  flex:1; padding:12px 14px; border-radius:14px;
+  box-shadow: var(--neu-in);
+  background:var(--bg);
+  display:flex; flex-direction:column; gap:3px;
+  transition:box-shadow .6s, background .8s;
+}
+.cmi-lbl { font-size:8px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.cmi-val { font-size:16px; font-weight:700; color:var(--accent); letter-spacing:-.5px; transition:color .6s; }
+
+/* ─── RIGHT CARD ────────────────────── */
+.right-card {
+  grid-column:3;
+  grid-row:1/3;
+  padding:28px 26px;
+  display:flex; flex-direction:column;
+  gap:0;
+}
+
+/* air quality widget */
+.aq-block {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:20px;
+}
+.aq-label { font-size:9px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--t3); margin-bottom:4px; }
+.aq-val { font-size:18px; font-weight:700; letter-spacing:-.5px; color:var(--t1); transition:color .8s; }
+.aq-dot { width:12px; height:12px; border-radius:50%; box-shadow:0 0 8px currentColor; transition:background .5s, box-shadow .5s; }
+
+/* Separator */
+.sep { height:1px; background:var(--bg-d); margin:16px 0; transition:background .8s; }
+
+/* Nearby cities */
+.nearby-lbl { font-size:9px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--t3); margin-bottom:12px; }
+.city-list { display:flex; flex-direction:column; gap:8px; }
+.nci {
+  display:flex; align-items:center;
+  padding:12px 16px; border-radius:14px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  cursor:default;
+  transition:box-shadow .2s var(--ease), transform .25s var(--spring), background .8s;
+}
+.nci:hover { box-shadow:var(--neu-out-md); transform:translateX(4px); }
+.nci:active { box-shadow:var(--neu-in); }
+.nci-name { font-size:12px; font-weight:500; color:var(--t1); flex:1; transition:color .8s; }
+.nci-tmp { font-size:16px; font-weight:700; letter-spacing:-1px; color:var(--accent); margin:0 10px; transition:color .6s; }
+.nci-ico { width:22px; height:22px; display:flex; align-items:center; justify-content:center; color:var(--accent); transition:color .6s; }
+
+/* Pressure & visibility detail */
+.detail-pair {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  margin-top:auto;
+}
+.det-item {
+  padding:14px 16px; border-radius:16px;
+  box-shadow: var(--neu-in);
+  background:var(--bg);
+  display:flex; flex-direction:column; gap:4px;
+  cursor:default;
+  transition:box-shadow .6s, background .8s;
+}
+.di-lbl { font-size:8px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.di-val { font-size:18px; font-weight:700; letter-spacing:-1px; color:var(--t1); transition:color .8s; }
+.di-unit { font-size:10px; font-weight:300; color:var(--t3); }
+
+/* ─── BOTTOM — FORECAST ─────────────── */
+.fc-card {
+  grid-column: 1 / -1;
+  padding:24px 28px;
+}
+.fc-eye { font-size:9px; font-weight:700; letter-spacing:3.5px; text-transform:uppercase; color:var(--t3); margin-bottom:18px; transition:color .8s; }
+.fc-row { display:flex; gap:10px; }
+.fc-item {
+  flex:1; min-width:80px;
+  padding:18px 12px; border-radius:18px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; gap:7px;
+  cursor:default;
+  transition:box-shadow .2s var(--ease), transform .3s var(--spring), background .8s;
+}
+.fc-item:hover { box-shadow: var(--neu-out-md); transform:translateY(-6px); }
+.fc-item:active { box-shadow: var(--neu-in); transform:scale(.97); }
+.fc-day { font-size:8px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.fc-ico-wrap {
+  width:40px; height:40px; border-radius:50%;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--accent);
+  transition:box-shadow .6s, background .8s, color .6s;
+}
+.fc-ico { width:28px; height:28px; }
+.fc-hi { font-size:16px; font-weight:700; letter-spacing:-.5px; color:var(--t1); transition:color .8s; }
+.fc-lo { font-size:11px; font-weight:300; color:var(--t3); }
+
+/* Wave graph */
+.wave-wrap { margin-top:18px; padding-top:18px; border-top:1px solid var(--bg-d); }
+.wave-days { display:flex; justify-content:space-between; margin-bottom:5px; }
+.wd { text-align:center; }
+.wd-hi { font-size:9px; font-weight:600; color:var(--accent); transition:color .6s; }
+.wd-lo { font-size:8px; font-weight:300; color:var(--t3); }
+#waveC { width:100%; height:44px; display:block; }
+
+/* ─── TOAST ─────────────────────────── */
+.toast {
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+  padding:11px 24px; border-radius:50px;
+  box-shadow: var(--neu-out-md);
+  background:var(--bg);
+  border-left:3px solid #e05050;
+  font-size:12px; font-weight:500; color:#e05050;
+  display:none; z-index:999; white-space:nowrap;
+  animation:tin .3s var(--ease);
+}
+@keyframes tin { from{opacity:0;transform:translateX(-50%) translateY(10px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+
+/* ─── RESPONSIVE ─────────────────────── */
+@media(max-width:1100px){
+  .grid { grid-template-columns:1fr 1fr; }
+  .center-card { grid-column:2; grid-row:1; }
+  .right-card { grid-column:1/3; grid-row:2; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .fc-card { grid-column:1/3; }
+}
+
+/* Tablet */
+@media(max-width:720px){
+  .grid { grid-template-columns:1fr; gap:10px; }
+  .wx-card,.center-card,.right-card,.fc-card {
+    grid-column:1 !important; grid-row:auto !important;
+  }
+  .right-card { display:flex; flex-direction:column; }
+  .app { padding:10px; gap:10px; }
+  .topbar { padding:10px 14px; gap:10px; }
+  .t-srch { max-width:none; }
+}
+
+/* Mobile — full proper fix */
+@media(max-width:480px){
+  body { overflow-x:hidden; }
+  .app { padding:8px; gap:8px; }
+
+  /* Hide cursor ring on touch */
+  #cur,#cur2 { display:none; }
+
+  /* Topbar — stack search below logo */
+  .topbar {
+    flex-wrap:wrap;
+    padding:10px 12px;
+    gap:8px;
+    height:auto;
+  }
+  .t-sep { display:none; }
+  .t-srch {
+    order:3; flex:none; width:100%;
+    max-width:none; margin-left:0;
+  }
+  .t-time { margin-left:auto; }
+
+  /* Grid — strict single column */
+  .grid {
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .wx-card,.center-card,.right-card,.fc-card {
+    grid-column:1 !important;
+    grid-row:auto !important;
+    width:100%;
+  }
+
+  /* Weather card */
+  .wx-card { padding:22px 18px; }
+  .wx-city { font-size:16px; }
+  .wx-tmp { font-size:72px; letter-spacing:-4px; }
+  .wx-chips { gap:6px; }
+  .chip { padding:6px 11px; font-size:11px; }
+
+  /* Center orb card — compact */
+  .center-card { padding:22px 18px; gap:14px; }
+  .cc-orb {
+    width:160px; height:160px;
+  }
+  .cc-big-tmp { font-size:52px; letter-spacing:-3px; }
+  .cc-sun-row { max-width:100%; }
+  .cc-sun-item { padding:10px 12px; }
+  .cc-meta-row { max-width:100%; }
+  .cc-gauge-wrap { max-width:100%; }
+
+  /* Right card */
+  .right-card {
+    padding:20px 18px;
+    display:flex; flex-direction:column; gap:0;
+  }
+  .detail-pair { grid-template-columns:1fr 1fr; }
+
+  /* Forecast */
+  .fc-card { padding:18px 14px; }
+  .fc-row { gap:6px; overflow-x:auto; padding-bottom:4px; }
+  .fc-item { min-width:68px; padding:14px 8px; }
+  .fc-hi { font-size:14px; }
+
+  /* Init overlay */
+  .init-logo { font-size:clamp(48px,14vw,80px); letter-spacing:-4px; }
+  .init-srch { padding:6px 6px 6px 16px; }
+  .init-srch input { font-size:13px; }
+  .btn-neu { padding:8px 18px; font-size:11px; }
+
+  /* Wave */
+  .wave-days { flex-wrap:wrap; gap:2px; }
+  .wd { flex:1; min-width:40px; }
+
+  /* MMF strip */
+  .mmf { padding-top:18px; }
+  .mmf-v { font-size:17px; }
+
+  /* Toast */
+  .toast { width:88vw; white-space:normal; text-align:center; font-size:11px; }
 }
 </style>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
-<!-- AUTH -->
-<div id="auth-screen">
-  <div class="auth-box">
-    <div class="auth-logo">OTAKU<span>VAULT</span></div>
-    <div class="auth-sub">The anime community — track, review, discuss</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchAuth('login')">Login</button>
-      <button class="auth-tab" onclick="switchAuth('signup')">Sign Up</button>
-    </div>
-    <div class="auth-err" id="auth-err"></div>
-    <div id="login-form">
-      <div class="field"><label>Email</label><input type="email" id="l-email" placeholder="you@example.com"></div>
-      <div class="field"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••"></div>
-      <button class="btn-full" onclick="doLogin()">Login</button>
-    </div>
-    <div id="signup-form" style="display:none">
-      <div class="field"><label>Username</label><input type="text" id="s-user" placeholder="your_username"></div>
-      <div class="field"><label>Email</label><input type="email" id="s-email" placeholder="you@example.com"></div>
-      <div class="field"><label>Password</label><input type="password" id="s-pass" placeholder="min 6 characters"></div>
-      <button class="btn-full" onclick="doSignup()">Create Account</button>
-    </div>
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- INIT OVERLAY -->
+<div class="init" id="initOv">
+  <div class="init-logo">SKYE</div>
+  <p class="init-sub">Live weather · minimal · precise</p>
+  <div class="init-srch">
+    <button class="btn-ico" id="iGeo"><i data-lucide="map-pin" style="width:16px;height:16px;"></i></button>
+    <input id="iInp" type="text" placeholder="Mumbai, Tokyo, New York..." autocomplete="off" spellcheck="false"/>
+    <button class="btn-neu" id="iGo">Search</button>
   </div>
+  <div class="ispin" id="iSpin"></div>
 </div>
 
-<!-- APP -->
-<div id="app">
-  <header>
-    <div class="logo">OTAKU<span>VAULT</span></div>
-    <nav>
-      <button class="nav-btn active" onclick="showPage('trending',this)">🔥 <span class="nl">Trending</span></button>
-      <button class="nav-btn" onclick="showPage('search',this)">🔍 <span class="nl">Search</span></button>
-      <button class="nav-btn" onclick="showPage('threads',this)">💬 <span class="nl">Threads</span></button>
-      <button class="nav-btn" onclick="showPage('mylist',this)">📋 <span class="nl">My List</span></button>
-      <button class="nav-btn" id="admin-nav-btn" style="display:none" onclick="showPage('admin',this)">🛡 <span class="nl">Admin</span></button>
-      <button class="nav-btn" id="profile-nav-btn" onclick="showPage('profile',this)">👤 <span class="nl">Profile</span></button>
-    </nav>
-    <div class="header-right">
-      <div class="qs-wrap">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Search..." id="qs" onkeypress="if(event.key==='Enter')qs_go()">
-      </div>
-      <div class="user-chip" onclick="showPage('profile',document.getElementById('profile-nav-btn'))">
-        <div class="avatar" id="user-av">?</div>
-        <span id="user-name">...</span>
-      </div>
-    </div>
-  </header>
-  <main>
-    <!-- TRENDING -->
-    <div class="page active" id="page-trending">
-      <div class="sec-title">TRENDING</div>
-      <div class="trend-stats" id="trend-stats">
-        <div class="stat-card"><div class="stat-label">Community Members</div><div class="stat-val" id="stat-members">—</div></div>
-        <div class="stat-card"><div class="stat-label">Anime Tracked</div><div class="stat-val" id="stat-tracked">—</div></div>
-        <div class="stat-card"><div class="stat-label">Reviews Written</div><div class="stat-val" id="stat-reviews">—</div></div>
-        <div class="stat-card"><div class="stat-label">Threads Active</div><div class="stat-val" id="stat-threads">—</div></div>
-      </div>
-      <div class="tab-row">
-        <button class="tab-btn active" onclick="loadTrending('airing',this)">Airing Now</button>
-        <button class="tab-btn" onclick="loadTrending('bypopularity',this)">Most Popular</button>
-        <button class="tab-btn" onclick="loadTrending('favorite',this)">All Time</button>
-      </div>
-      <div id="trending-grid"></div>
-    </div>
-    <!-- SEARCH -->
-    <div class="page" id="page-search">
-      <div class="sec-title">SEARCH</div>
-      <div style="max-width:640px;margin-bottom:1.5rem;">
-        <div style="display:flex;gap:0.7rem;align-items:center;margin-bottom:1rem;">
-          <div class="big-search" style="flex:1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="search-q" placeholder="Search anime by title..." onkeypress="if(event.key==='Enter')doSearch()"></div>
-          <button class="btn-accent" onclick="doSearch()">Search</button>
-        </div>
-        <div style="margin-bottom:0.6rem;">
-          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:0.65rem;">Quick search</div>
-          <div id="suggestion-chips" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-        </div>
-      </div>
-      <div id="search-discover">
-        <div class="sec-title" style="font-size:1.3rem;margin-bottom:1rem;">POPULAR RIGHT NOW</div>
-        <div id="search-popular-grid"></div>
-      </div>
-      <div id="search-results-wrap" style="display:none;">
-        <div class="sec-title" style="font-size:1.3rem;margin-bottom:1rem;" id="search-results-title">RESULTS</div>
-        <div id="search-grid"></div>
-      </div>
-    </div>
-    <!-- THREADS -->
-    <div class="page" id="page-threads">
-      <div id="threads-list-view">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:0.8rem;">
-          <div class="sec-title" style="margin-bottom:0;">COMMUNITY THREADS</div>
-          <button class="new-thread-btn" style="margin-bottom:0;" onclick="openNewThread()">+ New Thread</button>
-        </div>
-        <div id="threads-featured" style="margin-bottom:1.5rem;"></div>
-        <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:0.8rem;">ALL THREADS</div>
-        <div id="threads-container"></div>
-      </div>
-      <div id="thread-detail">
-        <button class="back-btn" onclick="backToThreads()">← Back to Threads</button>
-        <div id="thread-detail-content"></div>
-      </div>
-    </div>
-    <!-- MY LIST -->
-    <div class="page" id="page-mylist">
-      <div class="sec-title">MY LIST</div>
-      <div class="tab-row">
-        <button class="tab-btn active" onclick="filterMyList('all',this)">All</button>
-        <button class="tab-btn" onclick="filterMyList('watching',this)">Watching</button>
-        <button class="tab-btn" onclick="filterMyList('completed',this)">Completed</button>
-        <button class="tab-btn" onclick="filterMyList('plan',this)">Plan to Watch</button>
-      </div>
-      <div id="mylist-container"></div>
-    </div>
-    <!-- PROFILE -->
-    <div class="page" id="page-profile">
-      <div class="profile-header">
-        <div class="pfp-wrap">
-          <div class="pfp-big" id="pfp-big-wrap">
-            <span id="pfp-initials">?</span>
-          </div>
-          <div class="pfp-edit-btn" title="Change profile picture">
-            📷
-            <input type="file" accept="image/*" id="pfp-file-input" onchange="uploadPfp(this)">
-          </div>
-        </div>
-        <div class="profile-info">
-          <div class="profile-username" id="profile-username-display">—</div>
-          <div class="profile-username-lock">🔒 Username is permanent and cannot be changed</div>
-          <div class="profile-bio-wrap">
-            <input class="profile-bio-input" id="profile-bio-input" maxlength="120" placeholder="Write a short bio...">
-            <button class="btn-accent" style="padding:0.4rem 1rem;font-size:0.82rem;" onclick="saveBio()">Save</button>
-          </div>
-          <div class="profile-stats-row">
-            <div class="p-stat"><div class="p-stat-val" id="ps-tracked">0</div><div class="p-stat-lbl">Tracked</div></div>
-            <div class="p-stat"><div class="p-stat-val" id="ps-watching">0</div><div class="p-stat-lbl">Watching</div></div>
-            <div class="p-stat"><div class="p-stat-val" id="ps-completed">0</div><div class="p-stat-lbl">Completed</div></div>
-            <div class="p-stat"><div class="p-stat-val" id="ps-reviews">0</div><div class="p-stat-lbl">Reviews</div></div>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;gap:0.8rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
-        <button class="btn-ghost" onclick="goMyList()">📋 View My List</button>
-        <button class="btn-ghost" style="border-color:rgba(230,57,70,0.3);color:var(--accent);" onclick="doLogout()">🚪 Log Out</button>
-      </div>
-    </div>
-    <!-- ADMIN -->
-    <div class="page" id="page-admin">
-      <div class="sec-title">ADMIN PANEL</div>
-      <div class="admin-stat-row">
-        <div class="admin-stat"><div class="admin-stat-label">Total Reviews</div><div class="admin-stat-val" id="a-stat-reviews">—</div></div>
-        <div class="admin-stat"><div class="admin-stat-label">Anime Tracked</div><div class="admin-stat-val" id="a-stat-tracked">—</div></div>
-        <div class="admin-stat"><div class="admin-stat-label">Users</div><div class="admin-stat-val" id="a-stat-users">—</div></div>
-        <div class="admin-stat"><div class="admin-stat-label">Anonymous Reviews</div><div class="admin-stat-val" id="a-stat-anon">—</div></div>
-      </div>
-      <div class="admin-tabs">
-        <button class="tab-btn active" onclick="adminTab('reviews',this)">Reviews</button>
-        <button class="tab-btn" onclick="adminTab('animelist',this)">Anime List</button>
-      </div>
-      <div id="admin-reviews-section">
-        <button class="export-btn" onclick="exportExcel('reviews')">⬇ Export Reviews (.xlsx)</button>
-        <div class="table-wrap"><table class="admin-table" id="admin-reviews-table">
-          <thead><tr><th>Date</th><th>User</th><th>Anime</th><th>Rating</th><th>Review</th><th>Anonymous</th></tr></thead>
-          <tbody id="admin-reviews-body"><tr><td colspan="6" style="color:var(--muted);text-align:center;padding:2rem">Loading...</td></tr></tbody>
-        </table></div>
-      </div>
-      <div id="admin-animelist-section" style="display:none">
-        <button class="export-btn" onclick="exportExcel('animelist')">⬇ Export Anime List (.xlsx)</button>
-        <div class="table-wrap"><table class="admin-table" id="admin-animelist-table">
-          <thead><tr><th>Date</th><th>User</th><th>Anime</th><th>Type</th><th>Status</th><th>Rating</th><th>MAL Score</th></tr></thead>
-          <tbody id="admin-animelist-body"><tr><td colspan="7" style="color:var(--muted);text-align:center;padding:2rem">Loading...</td></tr></tbody>
-        </table></div>
-      </div>
-    </div>
-  </main>
-</div>
-
-<!-- ANIME MODAL -->
-<div class="overlay" id="anime-overlay" onclick="if(event.target===this)closeAnimeModal()">
-  <div class="modal">
-    <div class="modal-top">
-      <div class="modal-poster"><img id="m-img" src="" alt=""></div>
-      <div class="modal-info">
-        <div class="m-title" id="m-title">Loading...</div>
-        <div class="m-title-en" id="m-en"></div>
-        <div class="m-pills" id="m-pills"></div>
-        <div class="m-synopsis" id="m-synopsis"></div>
-      </div>
-    </div>
-    <div class="modal-bottom">
-      <div class="mlabel">Track Status</div>
-      <div class="status-row">
-        <button class="sbtn" id="sb-w" onclick="setStatus('watching')">👁 Watching</button>
-        <button class="sbtn" id="sb-c" onclick="setStatus('completed')">✅ Completed</button>
-        <button class="sbtn" id="sb-p" onclick="setStatus('plan')">🕐 Plan to Watch</button>
-      </div>
-      <div class="mlabel">Your Rating</div>
-      <div class="star-row" id="star-row">
-        <span class="star" data-n="1">★</span><span class="star" data-n="2">★</span>
-        <span class="star" data-n="3">★</span><span class="star" data-n="4">★</span><span class="star" data-n="5">★</span>
-      </div>
-      <div class="mlabel">Your Review</div>
-      <textarea class="review-ta" id="m-review" placeholder="Share your thoughts..."></textarea>
-      <div class="anon-row">
-        <div class="toggle" id="anon-tog" onclick="this.classList.toggle('on')"></div>
-        <label>Post anonymously</label>
-      </div>
-      <div class="action-row">
-        <button class="btn-ghost" onclick="removeFromList()">Remove</button>
-        <button class="btn-save" onclick="saveAnime()">Save to List</button>
-      </div>
-      <div class="reviews-section">
-        <div class="mlabel" style="margin-top:0">Community Reviews</div>
-        <div id="community-reviews"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- NEW THREAD MODAL -->
-<div class="overlay" id="thread-overlay" onclick="if(event.target===this)closeThreadModal()">
-  <div class="modal" style="max-width:520px;">
-    <div style="padding:1.4rem;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;margin-bottom:1.2rem;">NEW THREAD</div>
-      <div class="form-field"><label>Title</label><input type="text" id="t-title" placeholder="What do you want to discuss?"></div>
-      <div class="form-field"><label>Body (optional)</label><textarea id="t-body" placeholder="Share more details..."></textarea></div>
-      <div class="form-field"><label>Anime (optional — search to link)</label><input type="text" id="t-anime" placeholder="e.g. Naruto, Attack on Titan..."></div>
-      <div class="anon-row" style="margin-bottom:1rem;">
-        <div class="toggle" id="thread-anon-tog" onclick="this.classList.toggle('on')"></div>
-        <label style="font-size:0.82rem;color:var(--muted);">Post anonymously</label>
-      </div>
-      <div style="display:flex;gap:0.6rem;justify-content:flex-end;">
-        <button class="btn-ghost" onclick="closeThreadModal()">Cancel</button>
-        <button class="btn-save" onclick="submitThread()">Post Thread</button>
-      </div>
-    </div>
-  </div>
-</div>
-
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- APP -->
+<div class="app" id="appShell" style="display:none;">
+
+  <!-- TOPBAR -->
+  <header class="neu topbar">
+    <span class="t-logo">SKYE</span>
+    <div class="t-sep"></div>
+    <div class="t-srch">
+      <button class="btn-ico" id="tbGeo" style="width:30px;height:30px;box-shadow:none;"><i data-lucide="map-pin" style="width:14px;height:14px;"></i></button>
+      <input id="tbInp" type="text" placeholder="Search city..." autocomplete="off" spellcheck="false"/>
+      <div class="tspin" id="tSpin"></div>
+      <button class="btn-neu" id="tbGo" style="padding:7px 18px;">Search</button>
+    </div>
+    <div class="t-time">
+      <div class="t-hm" id="tHm">--:--</div>
+      <div class="t-dt" id="tDt">--</div>
+    </div>
+    <div class="ldot"></div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+
+    <!-- LEFT: Weather Info -->
+    <div class="wx-card neu">
+      <div class="wx-loc">
+        <span class="wx-city" id="wxCity">—</span>
+        <span class="wx-cc" id="wxCC">—</span>
+      </div>
+      <div class="wx-when" id="wxWhen">—</div>
+      <div class="wx-big">
+        <span class="wx-tmp" id="wxTmp">—</span>
+        <span class="wx-unit">°C</span>
+      </div>
+      <div class="wx-cond">
+        <div class="wx-ico-wrap" id="wxIcoWrap" style="color:var(--accent);"></div>
+        <div>
+          <div class="wx-desc" id="wxDesc">—</div>
+          <div class="wx-feels" id="wxFeels">—</div>
+        </div>
+      </div>
+      <div class="wx-chips">
+        <div class="chip"><span class="ch-i"><i data-lucide="droplets" style="width:13px;height:13px;"></i></span><span id="chH">—</span></div>
+        <div class="chip"><span class="ch-i"><i data-lucide="wind" style="width:13px;height:13px;"></i></span><span id="chW">—</span></div>
+        <div class="chip"><span class="ch-i"><i data-lucide="eye" style="width:13px;height:13px;"></i></span><span id="chV">—</span></div>
+        <div class="chip"><span class="ch-i"><i data-lucide="thermometer" style="width:13px;height:13px;"></i></span><span id="chP">—</span></div>
+      </div>
+      <div class="mmf">
+        <div class="mmf-i"><div class="mmf-v" id="mmMin">—</div><div class="mmf-l">Min</div></div>
+        <div class="mmf-i"><div class="mmf-v" id="mmFl">—</div><div class="mmf-l">Feels</div></div>
+        <div class="mmf-i"><div class="mmf-v" id="mmMax">—</div><div class="mmf-l">Max</div></div>
+      </div>
+    </div>
+
+    <!-- CENTER: Orb Display -->
+    <div class="center-card neu">
+      <div class="cc-orb">
+        <span class="cc-big-tmp" id="ccTmp">—</span>
+        <span class="cc-unit">°C</span>
+      </div>
+      <div class="cc-label" id="ccLabel">—</div>
+      <div class="cc-gauge-wrap">
+        <div class="cc-gauge-lbl"><span>HUMIDITY</span><span id="gaugeVal">—</span></div>
+        <div class="cc-gauge-track"><div class="cc-gauge-fill" id="gaugeFill" style="width:0%"></div></div>
+      </div>
+      <div class="cc-sun-row">
+        <div class="cc-sun-item">
+          <span class="csi-ico"><i data-lucide="sunrise" style="width:22px;height:22px;stroke:var(--accent);"></i></span>
+          <span class="csi-lbl">Sunrise</span>
+          <span class="csi-val" id="csSr">—</span>
+        </div>
+        <div class="cc-sun-item">
+          <span class="csi-ico"><i data-lucide="sunset" style="width:22px;height:22px;stroke:var(--accent);"></i></span>
+          <span class="csi-lbl">Sunset</span>
+          <span class="csi-val" id="csSs">—</span>
+        </div>
+      </div>
+      <div class="cc-meta-row">
+        <div class="cc-meta-item">
+          <span class="cmi-lbl">Wind</span>
+          <span class="cmi-val" id="ccWnd">—</span>
+        </div>
+        <div class="cc-meta-item">
+          <span class="cmi-lbl">Direction</span>
+          <span class="cmi-val" id="ccDir">—</span>
+        </div>
+        <div class="cc-meta-item">
+          <span class="cmi-lbl">Pressure</span>
+          <span class="cmi-val" id="ccPrs">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Nearby + Detail -->
+    <div class="right-card neu">
+      <div>
+        <div class="aq-block">
+          <div>
+            <div class="aq-label">Air Quality</div>
+            <div class="aq-val" id="aqVal">—</div>
+          </div>
+          <div class="aq-dot" id="aqDot"></div>
+        </div>
+        <div class="sep"></div>
+        <div class="nearby-lbl">Nearby Cities</div>
+        <div class="city-list" id="cityList">
+          <div class="nci"><span class="nci-name" style="color:var(--t3)">Loading...</span></div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="detail-pair">
+        <div class="det-item">
+          <div class="di-lbl">Visibility</div>
+          <div class="di-val" id="diVis">—</div>
+          <div class="di-unit">km</div>
+        </div>
+        <div class="det-item">
+          <div class="di-lbl">Cloud Cover</div>
+          <div class="di-val" id="diCld">—</div>
+          <div class="di-unit">%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: Forecast -->
+    <div class="fc-card neu">
+      <div class="fc-eye">5-Day Forecast</div>
+      <div class="fc-row" id="fcRow"></div>
+      <div class="wave-wrap">
+        <div class="wave-days" id="waveDays"></div>
+        <canvas id="waveC"></canvas>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <script>
-const SUPA_URL = 'https://xycodhqcfgfgtekiuptx.supabase.co';
-const SUPA_KEY = 'sb_publishable_yfymsQoziuqd-siDrbgVIA_aiyhojc-';
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+/* CONFIG */
+const KEY='49e9292ca08a1c7b6d62899698d144ff';
+const OWM='https://api.openweathermap.org/data/2.5';
+const NB=['Delhi','Pune','Bangalore','Hyderabad','Chennai'];
 
-let currentUser = null;
-let currentProfile = null;
-let currentAnime = null;
-let curStatus = null;
-let curRating = 0;
-let animeCache = {};
-let myListData = [];
-
-/* ——— AUTH ——— */
-function switchAuth(tab) {
-  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='signup'&&i===1)));
-  document.getElementById('login-form').style.display = tab==='login'?'block':'none';
-  document.getElementById('signup-form').style.display = tab==='signup'?'block':'none';
-  document.getElementById('auth-err').classList.remove('show');
-}
-function showAuthErr(msg){const e=document.getElementById('auth-err');e.textContent=msg;e.classList.add('show');}
-
-async function doLogin() {
-  const email = document.getElementById('l-email').value.trim();
-  const pass = document.getElementById('l-pass').value;
-  if(!email||!pass){showAuthErr('Fill in all fields');return;}
-  const {data,error} = await sb.auth.signInWithPassword({email,password:pass});
-  if(error){showAuthErr(error.message);return;}
-  await loadUser(data.user);
-}
-async function doSignup() {
-  const username = document.getElementById('s-user').value.trim();
-  const email = document.getElementById('s-email').value.trim();
-  const pass = document.getElementById('s-pass').value;
-  if(!username||!email||!pass){showAuthErr('Fill in all fields');return;}
-  if(pass.length<6){showAuthErr('Password must be 6+ characters');return;}
-  if(!/^[a-zA-Z0-9_]+$/.test(username)){showAuthErr('Username: letters, numbers, underscores only');return;}
-  const {data,error} = await sb.auth.signUp({email,password:pass,options:{data:{username}}});
-  if(error){showAuthErr(error.message);return;}
-  if(data.user && data.session){
-    await sb.from('profiles').upsert({id:data.user.id,username},{onConflict:'id'});
-    await loadUser(data.user);
-  } else if(data.user && !data.session){
-    showAuthErr('Check your email to confirm your account, then log in.');
-  } else {
-    showAuthErr('Something went wrong. Try again.');
-  }
-}
-async function doLogout() {
-  if(!confirm('Log out?'))return;
-  await sb.auth.signOut();
-  currentUser=null;currentProfile=null;
-  document.getElementById('app').style.display='none';
-  document.getElementById('auth-screen').style.display='flex';
-}
-async function loadUser(user) {
-  currentUser = user;
-  const {data:prof} = await sb.from('profiles').select('*').eq('id',user.id).single();
-  currentProfile = prof;
-  const uname = prof?.username || user.email.split('@')[0];
-  document.getElementById('user-name').textContent = uname;
-  renderAvatarChip(prof?.avatar_url||null, uname);
-  checkAdmin(user);
-  document.getElementById('auth-screen').style.display='none';
-  document.getElementById('app').style.display='block';
-  loadTrending('airing');
-  loadStats();
-  loadMyList();
+/* MULTI-PROXY FETCH */
+async function owm(ep){
+  const url=`${OWM}/${ep}`;
+  const chk=s=>{if(s===401)throw new Error('API_KEY');if(s===404)throw new Error('NOT_FOUND');};
+  try{const r=await fetch(url,{signal:AbortSignal.timeout(5000)});chk(r.status);if(r.ok)return await r.json();}
+  catch(e){if(['API_KEY','NOT_FOUND'].includes(e.message))throw e;}
+  try{
+    const r=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(9000)});
+    if(r.ok){const w=await r.json();const d=JSON.parse(w.contents);if(d.cod===401||d.cod==='401')throw new Error('API_KEY');if(d.cod==='404'||d.cod===404)throw new Error('NOT_FOUND');return d;}
+  }catch(e){if(['API_KEY','NOT_FOUND'].includes(e.message))throw e;}
+  try{const r=await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(9000)});chk(r.status);if(r.ok)return await r.json();}
+  catch(e){if(['API_KEY','NOT_FOUND'].includes(e.message))throw e;}
+  throw new Error('NETWORK');
 }
 
-/* ——— INIT ——— */
-(async()=>{
-  const {data:{session}} = await sb.auth.getSession();
-  if(session?.user) await loadUser(session.user);
+/* CURSOR */
+(function(){
+  const dot=document.getElementById('cur'),ring=document.getElementById('cur2');
+  let rx=0,ry=0;
+  addEventListener('mousemove',e=>{dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';});
+  (function l(){rx+=(parseFloat(dot.style.left||0)-rx)*.13;ry+=(parseFloat(dot.style.top||0)-ry)*.13;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(l);})();
+  document.querySelectorAll('a,button').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{dot.classList.add('big');ring.classList.add('xl');});
+    el.addEventListener('mouseleave',()=>{dot.classList.remove('big');ring.classList.remove('xl');});
+  });
 })();
 
-/* ——— STATS ——— */
-async function loadStats() {
-  const [m,t,r,th] = await Promise.all([
-    sb.from('profiles').select('id',{count:'exact',head:true}),
-    sb.from('anime_list').select('id',{count:'exact',head:true}),
-    sb.from('reviews').select('id',{count:'exact',head:true}),
-    sb.from('threads').select('id',{count:'exact',head:true})
-  ]);
-  document.getElementById('stat-members').textContent = m.count||0;
-  document.getElementById('stat-tracked').textContent = t.count||0;
-  document.getElementById('stat-reviews').textContent = r.count||0;
-  document.getElementById('stat-threads').textContent = th.count||0;
-}
+/* CLOCK */
+(function tick(){
+  const d=new Date(),h=String(d.getHours()%12||12).padStart(2,'0'),m=String(d.getMinutes()).padStart(2,'0'),ap=d.getHours()>=12?'PM':'AM';
+  document.getElementById('tHm').textContent=`${h}:${m} ${ap}`;
+  document.getElementById('tDt').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  setTimeout(tick,1000);
+})();
 
-/* ——— PAGES ——— */
-function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  btn.classList.add('active');
-  if(id==='threads'){loadThreads();return;}
-  if(id==='mylist'){renderMyList('all');return;}
-  if(id==='trending'){loadStats();return;}
-  if(id==='search'){initSearchPage();return;}
-  if(id==='admin'){loadAdminPage();return;}
-  if(id==='profile'){loadProfilePage();return;}
-}
+/* THEME */
+const TM={Clear:'clear',Clouds:'clouds',Rain:'rain',Drizzle:'rain',Thunderstorm:'thunderstorm',Snow:'snow',Mist:'mist',Fog:'mist',Haze:'mist'};
+function theme(m){const h=new Date().getHours();document.body.className=(h>=20||h<6)?'wx-night':'wx-'+(TM[m]||'clear');}
 
-/* ——— SKELETON ——— */
-function skel(cid,n=18){
-  const el=document.getElementById(cid);
-  el.className='skel-grid';
-  el.innerHTML=Array(n).fill(`<div class="skel-card"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line2"></div></div>`).join('');
+function aq(h){
+  if(h<45)return{t:'Excellent',c:'#2dc96a'};
+  if(h<65)return{t:'Good',c:'#6abf4a'};
+  if(h<80)return{t:'Moderate',c:'#e8c030'};
+  return{t:'Poor',c:'#e06040'};
 }
-
-/* ——— TRENDING ——— */
-async function loadTrending(filter='airing', btn=null) {
-  if(btn){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
-  skel('trending-grid');
-  try{
-    const r=await fetch(`https://api.jikan.moe/v4/top/anime?filter=${filter}&limit=24&sfw=true`);
-    const d=await r.json();
-    renderGrid('trending-grid',d.data||[]);
-  }catch{document.getElementById('trending-grid').innerHTML='<p style="color:var(--muted);padding:2rem 0">Could not load — check connection</p>';}
-}
-
-/* ——— SEARCH ——— */
-const SUGGESTIONS=['Naruto','Attack on Titan','One Piece','Demon Slayer','Solo Leveling','Jujutsu Kaisen','Dragon Ball Z','Death Note','Tokyo Revengers','Hunter x Hunter','Fullmetal Alchemist','Bleach','Vinland Saga','Chainsaw Man','Spy x Family'];
-function initSearchPage(){
-  const chips=document.getElementById('suggestion-chips');
-  if(chips&&!chips.children.length){
-    SUGGESTIONS.forEach(s=>{
-      const c=document.createElement('button');
-      c.textContent=s;
-      c.style.cssText='background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-family:Nunito,sans-serif;font-size:0.78rem;font-weight:700;padding:0.28rem 0.85rem;cursor:pointer;transition:all 0.2s;';
-      c.onmouseover=()=>{c.style.color='var(--text)';c.style.borderColor='rgba(230,57,70,0.4)';};
-      c.onmouseout=()=>{c.style.color='var(--muted)';c.style.borderColor='var(--border)';};
-      c.onclick=()=>{document.getElementById('search-q').value=s;doSearch();};
-      chips.appendChild(c);
-    });
-  }
-  if(!document.getElementById('search-popular-grid').children.length) loadSearchPopular();
-}
-async function loadSearchPopular(){
-  skel('search-popular-grid',12);
-  try{
-    const r=await fetch('https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=12&sfw=true');
-    const d=await r.json();
-    renderGrid('search-popular-grid',d.data||[]);
-  }catch{}
-}
-function qs_go(){
-  const q=document.getElementById('qs').value.trim();
-  if(!q)return;
-  document.getElementById('search-q').value=q;
-  showPage('search',document.querySelector('[onclick*="search"]'));
-  doSearch();
-}
-async function doSearch(){
-  const q=document.getElementById('search-q').value.trim();
-  if(!q)return;
-  document.getElementById('search-discover').style.display='none';
-  const wrap=document.getElementById('search-results-wrap');
-  wrap.style.display='block';
-  document.getElementById('search-results-title').textContent='RESULTS FOR "'+q.toUpperCase()+'"';
-  skel('search-grid',16);
-  try{
-    const r=await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=24&sfw=true`);
-    const d=await r.json();
-    if(!d.data?.length){document.getElementById('search-grid').innerHTML='<p style="color:var(--muted);padding:2rem 0">No results found</p>';return;}
-    renderGrid('search-grid',d.data);
-  }catch{document.getElementById('search-grid').innerHTML='<p style="color:var(--muted);padding:2rem 0">Search failed</p>';}
-}
-
-/* ——— RENDER GRID ——— */
-function renderGrid(cid, list) {
-  const el=document.getElementById(cid);
-  el.className='anime-grid';
-  const listMap={};myListData.forEach(e=>listMap[e.mal_id]=e);
-  const tagMap={watching:'tag-w',completed:'tag-c',plan:'tag-p'};
-  const tagLbl={watching:'W',completed:'✓',plan:'P'};
-  el.innerHTML=list.map(a=>{
-    const e=listMap[a.mal_id];
-    const badge=e?`<span class="list-tag ${tagMap[e.status]}">${tagLbl[e.status]}</span>`:'';
-    const img=a.images?.jpg?.large_image_url||a.images?.jpg?.image_url||'';
-    return `<div class="anime-card" onclick="openAnimeModal(${a.mal_id})">
-      ${badge}
-      <img src="${img}" alt="${escH(a.title)}" loading="lazy" onerror="this.style.background='var(--bg3)';this.removeAttribute('src')">
-      <div class="card-body">
-        <div class="card-title">${escH(a.title)}</div>
-        <div class="card-meta">
-          <span class="score-pill">★ ${a.score||'N/A'}</span>
-          <span class="type-lbl">${a.type||''}</span>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-/* ——— MY LIST ——— */
-async function loadMyList() {
-  if(!currentUser)return;
-  const {data}=await sb.from('anime_list').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  myListData=data||[];
-}
-function filterMyList(f,btn){
-  document.querySelectorAll('#page-mylist .tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderMyList(f);
-}
-function renderMyList(filter) {
-  const el=document.getElementById('mylist-container');
-  let entries=myListData;
-  if(filter!=='all')entries=entries.filter(e=>e.status===filter);
-  if(!entries.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">📭</div><h3>${filter==='all'?'Your list is empty':'Nothing here yet'}</h3><p>Search for anime and add them.</p></div>`;
-    return;
-  }
-  const colors={watching:'#60a5fa',completed:'#4ade80',plan:'#a78bfa'};
-  const labels={watching:'Watching',completed:'Completed',plan:'Plan to Watch'};
-  el.innerHTML=entries.map(e=>`
-    <div class="list-entry" onclick="openAnimeModal(${e.mal_id})">
-      <img src="${escH(e.image||'')}" onerror="this.style.background='var(--bg3)';this.removeAttribute('src')">
-      <div class="entry-info">
-        <div class="entry-title">${escH(e.title)}</div>
-        <div class="entry-meta">
-          <span style="font-size:0.77rem;font-weight:700;color:${colors[e.status]}">${labels[e.status]}</span>
-          ${e.user_rating?`<span style="font-size:0.77rem;color:var(--accent2)">${'★'.repeat(e.user_rating)}${'☆'.repeat(5-e.user_rating)}</span>`:''}
-          ${e.type?`<span style="font-size:0.7rem;color:var(--muted)">${e.type}</span>`:''}
-        </div>
-      </div>
-      ${e.mal_score?`<div style="text-align:right;flex-shrink:0"><div style="font-size:0.68rem;color:var(--muted)">MAL</div><div style="font-size:1rem;font-weight:700;color:var(--accent2)">${e.mal_score}</div></div>`:''}
-    </div>`).join('');
-}
-
-/* ——— ANIME MODAL ——— */
-async function openAnimeModal(id) {
-  currentAnime=null;curStatus=null;curRating=0;
-  document.getElementById('anon-tog').classList.remove('on');
-  resetModal();
-  document.getElementById('anime-overlay').classList.add('open');
-  document.body.style.overflow='hidden';
-  let a=animeCache[id];
-  if(!a){
-    try{
-      const r=await fetch(`https://api.jikan.moe/v4/anime/${id}`);
-      const d=await r.json();
-      a=d.data;animeCache[id]=a;
-    }catch{document.getElementById('m-title').textContent='Failed to load';return;}
-  }
-  currentAnime=a;
-  document.getElementById('m-img').src=a.images?.jpg?.large_image_url||a.images?.jpg?.image_url||'';
-  document.getElementById('m-title').textContent=a.title;
-  const en=a.title_english&&a.title_english!==a.title?a.title_english:'';
-  document.getElementById('m-en').textContent=en;
-  document.getElementById('m-synopsis').textContent=a.synopsis||'No synopsis available.';
-  document.getElementById('m-pills').innerHTML=[
-    a.score?`<span class="mpill gold">★ ${a.score}</span>`:'',
-    a.type?`<span class="mpill">${a.type}</span>`:'',
-    a.episodes?`<span class="mpill">${a.episodes} eps</span>`:'',
-    a.status?`<span class="mpill">${a.status}</span>`:'',
-    (a.season&&a.year)?`<span class="mpill">${a.season} ${a.year}</span>`:''
-  ].join('');
-  const entry=myListData.find(e=>e.mal_id===id);
-  if(entry){curStatus=entry.status;curRating=entry.user_rating||0;refreshStatusUI();refreshStars();}
-  loadCommunityReviews(id);
-}
-function resetModal(){
-  document.getElementById('m-title').textContent='Loading...';
-  document.getElementById('m-en').textContent='';
-  document.getElementById('m-pills').innerHTML='';
-  document.getElementById('m-synopsis').textContent='';
-  document.getElementById('m-img').src='';
-  document.getElementById('m-review').value='';
-  document.getElementById('community-reviews').innerHTML='';
-  document.querySelectorAll('.sbtn').forEach(b=>b.className='sbtn');
-  document.querySelectorAll('.star').forEach(s=>s.classList.remove('lit'));
-}
-function closeAnimeModal(){
-  document.getElementById('anime-overlay').classList.remove('open');
-  document.body.style.overflow='';
-  currentAnime=null;
-}
-
-/* ——— STATUS / STARS ——— */
-function setStatus(s){curStatus=curStatus===s?null:s;refreshStatusUI();}
-function refreshStatusUI(){
-  document.getElementById('sb-w').className='sbtn'+(curStatus==='watching'?' sw':'');
-  document.getElementById('sb-c').className='sbtn'+(curStatus==='completed'?' sc':'');
-  document.getElementById('sb-p').className='sbtn'+(curStatus==='plan'?' sp':'');
-}
-document.getElementById('star-row').addEventListener('click',e=>{
-  if(!e.target.classList.contains('star'))return;
-  const n=+e.target.dataset.n;
-  curRating=curRating===n?0:n;refreshStars();
-});
-document.getElementById('star-row').addEventListener('mouseover',e=>{
-  if(!e.target.classList.contains('star'))return;
-  const n=+e.target.dataset.n;
-  document.querySelectorAll('.star').forEach(s=>s.classList.toggle('lit',+s.dataset.n<=n));
-});
-document.getElementById('star-row').addEventListener('mouseout',()=>refreshStars());
-function refreshStars(){document.querySelectorAll('.star').forEach(s=>s.classList.toggle('lit',+s.dataset.n<=curRating));}
-
-/* ——— SAVE ANIME ——— */
-async function saveAnime(){
-  if(!currentAnime||!currentUser)return;
-  const id=currentAnime.mal_id;
-  const isAnon=document.getElementById('anon-tog').classList.contains('on');
-  const reviewText=document.getElementById('m-review').value.trim();
-  const upsertData={
-    user_id:currentUser.id,mal_id:id,title:currentAnime.title,
-    image:currentAnime.images?.jpg?.image_url||'',type:currentAnime.type||'',
-    mal_score:currentAnime.score||null,status:curStatus||'plan',user_rating:curRating||null
+function ico(m,size=20){
+  const map={
+    Clear:'sun', Clouds:'cloud', Rain:'cloud-rain',
+    Drizzle:'cloud-drizzle', Thunderstorm:'cloud-lightning',
+    Snow:'cloud-snow', Mist:'wind', Fog:'wind', Haze:'wind'
   };
-  const {error}=await sb.from('anime_list').upsert(upsertData,{onConflict:'user_id,mal_id'});
-  if(error){toast('Error saving: '+error.message);return;}
-  if(reviewText&&curRating){
-    await sb.from('reviews').insert({
-      user_id:currentUser.id,mal_id:id,anime_title:currentAnime.title,
-      anime_image:currentAnime.images?.jpg?.image_url||'',rating:curRating,
-      body:reviewText,is_anonymous:isAnon
+  const name=map[m]||'cloud';
+  // Return a placeholder div; lucide.createIcons() will render it
+  return `<i data-lucide="${name}" style="width:${size}px;height:${size}px;"></i>`;
+}
+function refreshIcons(){
+  if(window.lucide) lucide.createIcons();
+}
+
+/* COUNTER */
+function cnt(el,to){const t0=performance.now(),D=820;(function s(n){const p=Math.min((n-t0)/D,1);el.textContent=Math.round(to*(1-(1-p)**3));if(p<1)requestAnimationFrame(s);})(t0);}
+
+/* WAVE */
+function drawWave(data){
+  const cv=document.getElementById('waveC');
+  const pr=devicePixelRatio||1,W=cv.offsetWidth,H=44;
+  cv.width=W*pr;cv.height=H*pr;
+  const ctx=cv.getContext('2d');ctx.scale(pr,pr);
+  if(!data||data.length<2)return;
+  const hs=data.map(d=>d.hi),ls=data.map(d=>d.lo);
+  const all=[...hs,...ls],mn=Math.min(...all)-2,mx=Math.max(...all)+2;
+  const ty=t=>H-5-((t-mn)/(mx-mn))*(H-10),tx=i=>(i/(data.length-1))*(W-2)+1;
+  // Get accent color from CSS variable
+  const accent=getComputedStyle(document.body).getPropertyValue('--accent').trim()||'#4a90d9';
+  function wave(pts,col,w,fill){
+    ctx.beginPath();
+    pts.forEach((p,i)=>{if(i===0)ctx.moveTo(tx(i),ty(p));else{const cx=(tx(i-1)+tx(i))/2;ctx.bezierCurveTo(cx,ty(pts[i-1]),cx,ty(p),tx(i),ty(p));}});
+    if(fill){ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fillStyle=fill;ctx.fill();}
+    ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineJoin='round';ctx.stroke();
+  }
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,accent+'55');g.addColorStop(1,accent+'08');
+  wave(hs,accent,1.8,g);
+  wave(ls,getComputedStyle(document.body).getPropertyValue('--t3').trim()||'#8aa0b8',1,null);
+}
+
+/* PAINT */
+function paint(w,f){
+  theme(w.weather[0].main);
+  const fmt=t=>new Date(t*1000).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  const dir=d=>['N','NE','E','SE','S','SW','W','NW'][Math.round((d||0)/45)%8];
+
+  document.getElementById('wxCity').textContent=w.name;
+  document.getElementById('wxCC').textContent=w.sys.country;
+  document.getElementById('wxWhen').textContent=
+    new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})+
+    ' · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  cnt(document.getElementById('wxTmp'),Math.round(w.main.temp));
+  document.getElementById('wxIcoWrap').innerHTML=ico(w.weather[0].main);
+  document.getElementById('wxDesc').textContent=w.weather[0].description;
+  document.getElementById('wxFeels').textContent=`Feels like ${Math.round(w.main.feels_like)}°C`;
+  document.getElementById('chH').textContent=w.main.humidity+'%';
+  document.getElementById('chW').textContent=Math.round(w.wind.speed*3.6)+' km/h';
+  document.getElementById('chV').textContent=(w.visibility/1000).toFixed(1)+' km';
+  document.getElementById('chP').textContent=w.main.pressure+' hPa';
+  document.getElementById('mmMin').textContent=Math.round(w.main.temp_min)+'°';
+  document.getElementById('mmFl').textContent=Math.round(w.main.feels_like)+'°';
+  document.getElementById('mmMax').textContent=Math.round(w.main.temp_max)+'°';
+
+  // Center orb
+  cnt(document.getElementById('ccTmp'),Math.round(w.main.temp));
+  document.getElementById('ccLabel').textContent=w.weather[0].description.toUpperCase();
+  document.getElementById('gaugeVal').textContent=w.main.humidity+'%';
+  document.getElementById('gaugeFill').style.width=w.main.humidity+'%';
+  document.getElementById('csSr').textContent=fmt(w.sys.sunrise);
+  document.getElementById('csSs').textContent=fmt(w.sys.sunset);
+  document.getElementById('ccWnd').textContent=Math.round(w.wind.speed*3.6)+' km/h';
+  document.getElementById('ccDir').textContent=dir(w.wind.deg);
+  document.getElementById('ccPrs').textContent=w.main.pressure;
+
+  // Right card
+  const a=aq(w.main.humidity);
+  document.getElementById('aqVal').textContent=a.t;
+  document.getElementById('aqDot').style.background=a.c;
+  document.getElementById('aqDot').style.boxShadow=`0 0 8px ${a.c}`;
+  document.getElementById('diVis').textContent=(w.visibility/1000).toFixed(1);
+  document.getElementById('diCld').textContent=w.clouds?.all??'—';
+
+  loadNearby(w.name);
+
+  if(f){
+    const DAYS=['SUN','MON','TUE','WED','THU','FRI','SAT'],map={};
+    f.list.forEach(it=>{
+      const d=new Date(it.dt*1000),k=d.toDateString();
+      if(!map[k])map[k]={day:DAYS[d.getDay()],hi:[],lo:[],main:it.weather[0].main};
+      map[k].hi.push(it.main.temp_max);map[k].lo.push(it.main.temp_min);
     });
-  }
-  await loadMyList();
-  toast(`"${currentAnime.title}" saved!`);
-  closeAnimeModal();
-}
-async function removeFromList(){
-  if(!currentAnime||!currentUser)return;
-  await sb.from('anime_list').delete().eq('user_id',currentUser.id).eq('mal_id',currentAnime.mal_id);
-  await loadMyList();
-  toast('Removed from list');
-  closeAnimeModal();
-}
-
-/* ——— COMMUNITY REVIEWS ——— */
-async function loadCommunityReviews(mal_id){
-  const el=document.getElementById('community-reviews');
-  el.innerHTML='<p style="color:var(--muted);font-size:0.8rem">Loading reviews...</p>';
-  const {data}=await sb.from('reviews').select('*,profiles(username)').eq('mal_id',mal_id).order('created_at',{ascending:false}).limit(20);
-  if(!data?.length){el.innerHTML='<p style="color:var(--muted);font-size:0.8rem;font-style:italic">No reviews yet. Be the first!</p>';return;}
-  el.innerHTML=data.map(r=>{
-    const uname=r.is_anonymous?'Anonymous':r.profiles?.username||'User';
-    const stars='★'.repeat(r.rating||0)+'☆'.repeat(5-(r.rating||0));
-    return `<div class="review-card">
-      <div class="rv-header">
-        <span class="rv-user ${r.is_anonymous?'rv-anon':''}">${escH(uname)}</span>
-        <span class="rv-stars">${stars}</span>
-      </div>
-      <div class="rv-text">${escH(r.body)}</div>
-    </div>`;
-  }).join('');
-}
-
-/* ——— THREADS ——— */
-const THREAD_STARTERS=[
-  {title:'Which anime has the best soundtrack of all time?',body:'Naruto, AoT, Demon Slayer — too many bangers. Drop your number one pick.'},
-  {title:'Most underrated anime that deserves more attention',body:'Drop your hidden gems here. Anime that flew under the radar but deserves love.'},
-  {title:'Who is the greatest anime villain ever written?',body:'Light Yagami, Madara, All For One — make your case.'},
-  {title:'Best anime arc of all time',body:'Marineford, Chimera Ant, Mugen Train — what arc had you at the edge of your seat?'},
-  {title:'Anime that made you cry',body:'Share the ones that absolutely destroyed you emotionally.'},
-];
-async function loadThreads(){
-  const el=document.getElementById('threads-container');
-  const featEl=document.getElementById('threads-featured');
-  el.innerHTML='<p style="color:var(--muted)">Loading...</p>';
-  const {data}=await sb.from('threads').select('*,profiles(username)').order('created_at',{ascending:false}).limit(40);
-
-  // Featured / hot threads — top 3 by upvotes, or starters if empty
-  if(data&&data.length>0){
-    const hot=[...data].sort((a,b)=>(b.upvotes||0)-(a.upvotes||0)).slice(0,3);
-    featEl.innerHTML=`
-      <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:0.7rem;">🔥 HOT THREADS</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0.7rem;">
-        ${hot.map(t=>`<div class="thread-card" style="margin-bottom:0;border-color:rgba(244,162,97,0.2);" onclick="openThread(${t.id})">
-          <div class="thread-title" style="font-size:0.88rem;">${escH(t.title)}</div>
-          <div class="thread-footer" style="margin-top:0.5rem;">
-            <span class="meta-chip">💬 ${t.reply_count||0}</span>
-            <span class="upvote-btn" style="pointer-events:none;">▲ ${t.upvotes||0}</span>
-          </div>
-        </div>`).join('')}
-      </div>`;
-  } else {
-    // Show conversation starter suggestions when no threads exist
-    featEl.innerHTML=`
-      <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:0.7rem;">💡 START A CONVERSATION</div>
-      <div style="display:flex;flex-direction:column;gap:0.5rem;">
-        ${THREAD_STARTERS.map((s,i)=>`<div class="starter-card" data-idx="${i}" style="background:var(--bg3);border:1px dashed rgba(255,255,255,0.1);border-radius:10px;padding:0.8rem 1rem;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(230,57,70,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'" onclick="prefillThread(this.dataset.idx)">
-          <div style="font-size:0.88rem;font-weight:700;color:var(--text);margin-bottom:0.2rem;">${escH(s.title)}</div>
-          <div style="font-size:0.78rem;color:var(--muted);">${escH(s.body)}</div>
-        </div>`).join('')}
-      </div>`;
+    const days=Object.values(map).slice(0,5);
+    const fr=document.getElementById('fcRow');fr.innerHTML='';
+    days.forEach(d=>{
+      const hi=Math.round(Math.max(...d.hi)),lo=Math.round(Math.min(...d.lo));
+      const el=document.createElement('div');el.className='fc-item';
+      el.innerHTML=`<div class="fc-day">${d.day}</div><div class="fc-ico-wrap" style="color:var(--accent);">${ico(d.main)}</div><div class="fc-hi">${hi}°</div><div class="fc-lo">${lo}°</div>`;
+      fr.appendChild(el);
+    });
+    const allDays=Object.values(map).slice(0,7);
+    const wd=allDays.map(d=>({hi:Math.round(Math.max(...d.hi)),lo:Math.round(Math.min(...d.lo)),day:d.day}));
+    const wdEl=document.getElementById('waveDays');wdEl.innerHTML='';
+    wd.forEach(d=>{const el=document.createElement('div');el.className='wd';el.innerHTML=`<div class="wd-hi">${d.hi}°</div><div class="wd-lo">${d.lo}°</div>`;wdEl.appendChild(el);});
+    setTimeout(()=>drawWave(wd),80);
   }
 
-  if(!data?.length){el.innerHTML='';return;}
-  el.innerHTML=data.map(t=>{
-    const uname=t.is_anonymous?'Anonymous':t.profiles?.username||'User';
-    const ago=timeAgo(t.created_at);
-    return `<div class="thread-card" onclick="openThread(${t.id})">
-      <div class="thread-header">
-        <div class="thread-title">${escH(t.title)}</div>
-        ${t.anime_title?`<span class="thread-anime-tag">${escH(t.anime_title)}</span>`:''}
-      </div>
-      ${t.body?`<div class="thread-body">${escH(t.body)}</div>`:''}
-      <div class="thread-footer">
-        <span class="meta-chip">👤 ${escH(uname)}</span>
-        <span class="meta-chip">🕐 ${ago}</span>
-        <span class="meta-chip">💬 ${t.reply_count||0} replies</span>
-        <button class="upvote-btn" onclick="upvoteThread(event,${t.id},this)">▲ ${t.upvotes||0}</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-function prefillThread(idx){
-  const s=THREAD_STARTERS[+idx];
-  if(!s)return;
-  openNewThread();
-  setTimeout(()=>{
-    document.getElementById('t-title').value=s.title;
-    document.getElementById('t-body').value=s.body;
-  },100);
-}
-async function openThread(id){
-  document.getElementById('threads-list-view').style.display='none';
-  document.getElementById('thread-detail').style.display='block';
-  const el=document.getElementById('thread-detail-content');
-  el.innerHTML='<p style="color:var(--muted)">Loading thread...</p>';
-  const {data:t}=await sb.from('threads').select('*,profiles(username)').eq('id',id).single();
-  const {data:replies}=await sb.from('thread_replies').select('*,profiles(username)').eq('thread_id',id).order('created_at',{ascending:true});
-  const uname=t.is_anonymous?'Anonymous':t.profiles?.username||'User';
-  el.innerHTML=`
-    <div class="thread-detail-box">
-      <div class="td-title">${escH(t.title)}</div>
-      <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.7rem;">
-        <span style="font-size:0.78rem;color:var(--accent2);font-weight:700">${escH(uname)}</span>
-        ${t.anime_title?`<span class="thread-anime-tag">${escH(t.anime_title)}</span>`:''}
-        <span style="font-size:0.75rem;color:var(--muted)">${timeAgo(t.created_at)}</span>
-      </div>
-      ${t.body?`<div class="td-body">${escH(t.body)}</div>`:''}
-    </div>
-    <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:0.8rem">${(replies||[]).length} Replies</div>
-    <div id="replies-container">
-      ${(replies||[]).map(r=>{
-        const ru=r.is_anonymous?'Anonymous':r.profiles?.username||'User';
-        return `<div class="reply-entry">
-          <div class="rv-header">
-            <span class="reply-user ${r.is_anonymous?'rv-anon':''}">${escH(ru)}</span>
-            <span style="font-size:0.72rem;color:var(--muted)">${timeAgo(r.created_at)}</span>
-          </div>
-          <div class="reply-text">${escH(r.body)}</div>
-        </div>`;
-      }).join('')}
-    </div>
-    <div style="margin-top:1rem">
-      <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:0.5rem">Add a Reply</div>
-      <textarea class="reply-box" id="reply-input" placeholder="Write your reply..."></textarea>
-      <div class="anon-row" style="margin-bottom:0.8rem">
-        <div class="toggle" id="reply-anon" onclick="this.classList.toggle('on')"></div>
-        <label style="font-size:0.82rem;color:var(--muted)">Post anonymously</label>
-      </div>
-      <button class="btn-save" onclick="submitReply(${id})">Post Reply</button>
-    </div>`;
-}
-async function submitReply(threadId){
-  const body=document.getElementById('reply-input').value.trim();
-  if(!body){toast('Write something first!');return;}
-  const isAnon=document.getElementById('reply-anon').classList.contains('on');
-  await sb.from('thread_replies').insert({thread_id:threadId,user_id:currentUser.id,body,is_anonymous:isAnon});
-  await sb.from('threads').update({reply_count:sb.rpc}).eq('id',threadId);
-  const {data:cnt}=await sb.from('thread_replies').select('id',{count:'exact',head:true}).eq('thread_id',threadId);
-  await sb.from('threads').update({reply_count:cnt?.count||0}).eq('id',threadId);
-  toast('Reply posted!');
-  openThread(threadId);
-}
-function backToThreads(){
-  document.getElementById('threads-list-view').style.display='block';
-  document.getElementById('thread-detail').style.display='none';
-  loadThreads();
-}
-function openNewThread(){document.getElementById('thread-overlay').classList.add('open');document.body.style.overflow='hidden';}
-function closeThreadModal(){document.getElementById('thread-overlay').classList.remove('open');document.body.style.overflow='';}
-async function submitThread(){
-  const title=document.getElementById('t-title').value.trim();
-  if(!title){toast('Title is required');return;}
-  const body=document.getElementById('t-body').value.trim();
-  const animeStr=document.getElementById('t-anime').value.trim();
-  const isAnon=document.getElementById('thread-anon-tog').classList.contains('on');
-  await sb.from('threads').insert({user_id:currentUser.id,title,body:body||null,anime_title:animeStr||null,is_anonymous:isAnon});
-  closeThreadModal();
-  document.getElementById('t-title').value='';
-  document.getElementById('t-body').value='';
-  document.getElementById('t-anime').value='';
-  toast('Thread posted!');
-  loadThreads();
-}
-async function upvoteThread(e,id,btn){
-  e.stopPropagation();
-  const {data}=await sb.from('threads').select('upvotes').eq('id',id).single();
-  const newVal=(data?.upvotes||0)+1;
-  await sb.from('threads').update({upvotes:newVal}).eq('id',id);
-  btn.textContent=`▲ ${newVal}`;
-  btn.classList.add('voted');
+  document.getElementById('appShell').style.display='flex';
+  setTimeout(refreshIcons, 50);
 }
 
-function goMyList(){
-  const btn = document.querySelector('.nav-btn[onclick*="mylist"]');
-  showPage('mylist', btn||document.createElement('button'));
+async function loadNearby(ex){
+  const list=document.getElementById('cityList');
+  list.innerHTML='<div class="nci"><span class="nci-name" style="color:var(--t3)">Loading...</span></div>';
+  const cities=NB.filter(c=>c.toLowerCase()!==ex.toLowerCase()).slice(0,4);
+  const results=await Promise.all(cities.map(async c=>{try{return await owm(`weather?q=${c}&units=metric&appid=${KEY}`);}catch{return null;}}));
+  list.innerHTML='';
+  results.forEach(w=>{
+    if(!w)return;
+    const el=document.createElement('div');el.className='nci';
+    el.innerHTML=`<span class="nci-name">${w.name}</span><span class="nci-tmp">${Math.round(w.main.temp)}°</span><span class="nci-ico" style="color:var(--accent);display:flex;align-items:center;">${ico(w.weather[0].main)}</span>`;
+    list.appendChild(el);
+  });
+  setTimeout(refreshIcons,50);
 }
 
-/* ——— PROFILE ——— */
-async function loadProfilePage(){
-  if(!currentUser||!currentProfile)return;
-  const uname = currentProfile.username || currentUser.email.split('@')[0];
-  document.getElementById('profile-username-display').textContent = uname;
-  document.getElementById('profile-bio-input').value = currentProfile.bio || '';
-
-  // PFP
-  renderPfpBig(currentProfile.avatar_url, uname);
-
-  // Stats
-  const watching = myListData.filter(e=>e.status==='watching').length;
-  const completed = myListData.filter(e=>e.status==='completed').length;
-  document.getElementById('ps-tracked').textContent = myListData.length;
-  document.getElementById('ps-watching').textContent = watching;
-  document.getElementById('ps-completed').textContent = completed;
-  const {count} = await sb.from('reviews').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id);
-  document.getElementById('ps-reviews').textContent = count||0;
+/* SEARCH */
+async function search(city){
+  spin(true);
+  try{
+    const[w,f]=await Promise.all([
+      owm(`weather?q=${encodeURIComponent(city)}&units=metric&appid=${KEY}`),
+      owm(`forecast?q=${encodeURIComponent(city)}&units=metric&appid=${KEY}`)
+    ]);
+    localStorage.setItem('skye',city);
+    document.getElementById('tbInp').value=city;
+    paint(w,f);
+    document.getElementById('initOv').classList.add('gone');
+  }catch(e){
+    const m={'API_KEY':'⚠ API key not active — wait 10 min after signup.','NOT_FOUND':`City not found. Try "Mumbai".`,'NETWORK':'Network error. Check your connection.'};
+    showToast(m[e.message]||'Something went wrong.');
+  }finally{spin(false);}
+}
+async function searchCoords(la,lo){
+  spin(true);
+  try{
+    const[w,f]=await Promise.all([owm(`weather?lat=${la}&lon=${lo}&units=metric&appid=${KEY}`),owm(`forecast?lat=${la}&lon=${lo}&units=metric&appid=${KEY}`)]);
+    document.getElementById('tbInp').value=w.name;localStorage.setItem('skye',w.name);
+    paint(w,f);document.getElementById('initOv').classList.add('gone');
+  }catch{showToast('Location error.');}
+  finally{spin(false);}
 }
 
-function renderPfpBig(url, uname){
-  const wrap = document.getElementById('pfp-big-wrap');
-  if(url){
-    wrap.innerHTML = `<img src="${escH(url)}" alt="pfp" onerror="this.parentNode.innerHTML='<span id=pfp-initials>${escH(uname[0].toUpperCase())}</span>'">`;
-  } else {
-    wrap.innerHTML = `<span id="pfp-initials">${escH(uname[0].toUpperCase())}</span>`;
-  }
-}
+function spin(v){['iSpin','tSpin'].forEach(id=>document.getElementById(id).style.display=v?'block':'none');}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(window._t);window._t=setTimeout(()=>t.style.display='none',5500);}
+function go(id){const v=document.getElementById(id).value.trim();if(v)search(v);else showToast('Enter a city name.');}
+function geoGo(){if(!navigator.geolocation)return showToast('Geolocation not supported.');navigator.geolocation.getCurrentPosition(p=>searchCoords(p.coords.latitude,p.coords.longitude),()=>showToast('Location denied.'));}
 
-function renderAvatarChip(url, uname){
-  const el = document.getElementById('user-av');
-  if(url){
-    el.innerHTML = `<img src="${escH(url)}" alt="av">`;
-  } else {
-    el.textContent = uname[0].toUpperCase();
-  }
-}
+document.getElementById('iGo').onclick=()=>go('iInp');
+document.getElementById('iInp').onkeydown=e=>{if(e.key==='Enter')go('iInp');};
+document.getElementById('iGeo').onclick=geoGo;
+document.getElementById('tbGo').onclick=()=>go('tbInp');
+document.getElementById('tbInp').onkeydown=e=>{if(e.key==='Enter')go('tbInp');};
+document.getElementById('tbGeo').onclick=geoGo;
+document.querySelectorAll('input').forEach(el=>el.style.cursor='text');
 
-async function uploadPfp(input){
-  const file = input.files[0];
-  if(!file||!currentUser)return;
-  if(file.size > 2*1024*1024){toast('Image too large — max 2MB');return;}
-  const wrap = document.getElementById('pfp-big-wrap');
-  wrap.classList.add('pfp-uploading');
-  toast('Uploading...');
-  const ext = file.name.split('.').pop();
-  const path = `${currentUser.id}/avatar.${ext}`;
-  const {error} = await sb.storage.from('avatars').upload(path, file, {upsert:true,contentType:file.type});
-  if(error){toast('Upload failed: '+error.message);wrap.classList.remove('pfp-uploading');return;}
-  const {data} = sb.storage.from('avatars').getPublicUrl(path);
-  const url = data.publicUrl + '?t=' + Date.now();
-  await sb.from('profiles').update({avatar_url:url}).eq('id',currentUser.id);
-  currentProfile.avatar_url = url;
-  renderPfpBig(url, currentProfile.username);
-  renderAvatarChip(url, currentProfile.username);
-  wrap.classList.remove('pfp-uploading');
-  toast('Profile picture updated!');
-  input.value='';
-}
-
-async function saveBio(){
-  const bio = document.getElementById('profile-bio-input').value.trim();
-  await sb.from('profiles').update({bio}).eq('id',currentUser.id);
-  currentProfile.bio = bio;
-  toast('Bio saved!');
-}
-
-/* ——— ADMIN ——— */
-const ADMIN_EMAIL = 'shaikhshahnwaaz84@gmail.com';
-const ADMIN_UID = 'b3d04e03-b578-4b7e-b226-113e513216f6';
-let adminReviewsData = [];
-let adminAnimeData = [];
-
-function checkAdmin(user){
-  const email = user?.email || '';
-  const uid = user?.id || '';
-  const isAdmin = email === ADMIN_EMAIL || uid === ADMIN_UID;
-  console.log('[OV Admin] email:', email, '| uid:', uid, '| isAdmin:', isAdmin);
-  const btn = document.getElementById('admin-nav-btn');
-  if(btn) btn.style.display = isAdmin ? 'inline-block' : 'none';
-}
-
-async function loadAdminPage(){
-  // Stats
-  const [rv,al,us,an] = await Promise.all([
-    sb.from('reviews').select('id',{count:'exact',head:true}),
-    sb.from('anime_list').select('id',{count:'exact',head:true}),
-    sb.from('profiles').select('id',{count:'exact',head:true}),
-    sb.from('reviews').select('id',{count:'exact',head:true}).eq('is_anonymous',true)
-  ]);
-  document.getElementById('a-stat-reviews').textContent = rv.count||0;
-  document.getElementById('a-stat-tracked').textContent = al.count||0;
-  document.getElementById('a-stat-users').textContent = us.count||0;
-  document.getElementById('a-stat-anon').textContent = an.count||0;
-
-  // Load reviews
-  const {data:reviews} = await sb.from('reviews')
-    .select('*,profiles(username)')
-    .order('created_at',{ascending:false})
-    .limit(500);
-  adminReviewsData = reviews||[];
-  const rb = document.getElementById('admin-reviews-body');
-  if(!adminReviewsData.length){
-    rb.innerHTML='<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:2rem">No reviews yet</td></tr>';
-  } else {
-    rb.innerHTML = adminReviewsData.map(r=>`<tr>
-      <td>${new Date(r.created_at).toLocaleDateString()}</td>
-      <td>${escH(r.is_anonymous?'Anonymous':r.profiles?.username||'—')}</td>
-      <td title="${escH(r.anime_title)}">${escH(r.anime_title)}</td>
-      <td>${'★'.repeat(r.rating||0)}</td>
-      <td title="${escH(r.body)}">${escH(r.body)}</td>
-      <td>${r.is_anonymous?'Yes':'No'}</td>
-    </tr>`).join('');
-  }
-
-  // Load anime list
-  const {data:alist} = await sb.from('anime_list')
-    .select('*,profiles(username)')
-    .order('created_at',{ascending:false})
-    .limit(500);
-  adminAnimeData = alist||[];
-  const ab = document.getElementById('admin-animelist-body');
-  if(!adminAnimeData.length){
-    ab.innerHTML='<tr><td colspan="7" style="color:var(--muted);text-align:center;padding:2rem">No entries yet</td></tr>';
-  } else {
-    ab.innerHTML = adminAnimeData.map(a=>`<tr>
-      <td>${new Date(a.created_at).toLocaleDateString()}</td>
-      <td>${escH(a.profiles?.username||'—')}</td>
-      <td title="${escH(a.title)}">${escH(a.title)}</td>
-      <td>${escH(a.type||'—')}</td>
-      <td>${escH(a.status||'—')}</td>
-      <td>${a.user_rating?'★'.repeat(a.user_rating):'—'}</td>
-      <td>${a.mal_score||'—'}</td>
-    </tr>`).join('');
-  }
-}
-
-function adminTab(tab, btn){
-  document.querySelectorAll('#page-admin .tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('admin-reviews-section').style.display = tab==='reviews'?'block':'none';
-  document.getElementById('admin-animelist-section').style.display = tab==='animelist'?'block':'none';
-}
-
-function exportExcel(type){
-  const wb = XLSX.utils.book_new();
-  let ws, filename;
-  if(type==='reviews'){
-    const rows = adminReviewsData.map(r=>({
-      Date: new Date(r.created_at).toLocaleDateString(),
-      Username: r.is_anonymous?'Anonymous':r.profiles?.username||'Unknown',
-      Anime: r.anime_title,
-      Rating: r.rating||0,
-      Review: r.body,
-      Anonymous: r.is_anonymous?'Yes':'No'
-    }));
-    ws = XLSX.utils.json_to_sheet(rows);
-    ws['!cols'] = [{wch:12},{wch:18},{wch:28},{wch:8},{wch:50},{wch:10}];
-    filename = 'otakuvault_reviews.xlsx';
-  } else {
-    const rows = adminAnimeData.map(a=>({
-      Date: new Date(a.created_at).toLocaleDateString(),
-      Username: a.profiles?.username||'Unknown',
-      Anime: a.title,
-      Type: a.type||'',
-      Status: a.status,
-      'User Rating': a.user_rating||'',
-      'MAL Score': a.mal_score||''
-    }));
-    ws = XLSX.utils.json_to_sheet(rows);
-    ws['!cols'] = [{wch:12},{wch:18},{wch:30},{wch:10},{wch:12},{wch:12},{wch:10}];
-    filename = 'otakuvault_animelist.xlsx';
-  }
-  XLSX.utils.book_append_sheet(wb, ws, type==='reviews'?'Reviews':'Anime List');
-  XLSX.writeFile(wb, filename);
-  toast('Downloading '+filename);
-}
-
-/* ——— UTILS ——— */
-function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function timeAgo(ts){
-  const s=Math.floor((Date.now()-new Date(ts))/1000);
-  if(s<60)return 'just now';if(s<3600)return `${Math.floor(s/60)}m ago`;
-  if(s<86400)return `${Math.floor(s/3600)}h ago`;return `${Math.floor(s/86400)}d ago`;
-}
-let toastT;
-function toast(msg){
-  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
-  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),3000);
-}
+const last=localStorage.getItem('skye');
+if(last){document.getElementById('iInp').value=last;search(last);}
+// Initial icon render for static icons
+if(window.lucide) lucide.createIcons();
+window.addEventListener('load', ()=>{ if(window.lucide) lucide.createIcons(); });
 </script>
 </body>
 </html>
