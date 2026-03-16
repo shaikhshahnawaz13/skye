@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SKYE</title>
+<link rel="icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════
+   NEUMORPHISM DESIGN SYSTEM
+   
+   Core idea: one background color, elements
+   appear raised or pressed using two shadows —
+   light from top-left, dark from bottom-right.
+   
+   No gradients on cards. No cartoon elements.
+   Pure tactile softness.
+═══════════════════════════════════════════ */
+:root {
+  /* base surface — all elements match this */
+  --bg:      #e8eef6;
+  --bg-d:    #d1dae6;   /* darker shadow */
+  --bg-l:    #ffffff;   /* lighter highlight */
+
+  /* neumorphic shadows (the magic) */
+  --neu-out: 
+    6px 6px 14px var(--bg-d),
+    -6px -6px 14px var(--bg-l);
+  --neu-out-md:
+    10px 10px 24px var(--bg-d),
+    -10px -10px 24px var(--bg-l);
+  --neu-out-lg:
+    16px 16px 36px var(--bg-d),
+    -16px -16px 36px var(--bg-l);
+  --neu-in:
+    inset 4px 4px 10px var(--bg-d),
+    inset -4px -4px 10px var(--bg-l);
+  --neu-in-md:
+    inset 6px 6px 16px var(--bg-d),
+    inset -6px -6px 16px var(--bg-l);
+
+  /* accent — one color only, used sparingly */
+  --accent:  #4a90d9;
+  --acc-l:   #72aee8;
+  --acc-d:   #2e6cb0;
+
+  /* text */
+  --t1: #1a2a3a;
+  --t2: #5a7290;
+  --t3: #8aa0b8;
+
+  --r: 20px;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+  --spring: cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* Weather accent colors — subtle, not background */
+body.wx-clear        { --accent:#e8a020; --acc-l:#f0bc50; --acc-d:#c07810; }
+body.wx-clouds       { --accent:#6a8aaa; --acc-l:#8aaccb; --acc-d:#4a6a8a; }
+body.wx-rain         { --accent:#3a78b8; --acc-l:#5a98d8; --acc-d:#1a5898; }
+body.wx-thunderstorm { --accent:#5a4a9a; --acc-l:#7a6aba; --acc-d:#3a2a7a; }
+body.wx-snow         { --accent:#7ab8e8; --acc-l:#9ad0f8; --acc-d:#5a98c8; }
+body.wx-mist         { --accent:#7a9ab0; --acc-l:#9ab8cc; --acc-d:#5a7a90; }
+
+/* Night mode */
+body.wx-night {
+  --bg:    #1e2836;
+  --bg-d:  #141c28;
+  --bg-l:  #28364a;
+  --t1: rgba(255,255,255,.90);
+  --t2: rgba(255,255,255,.50);
+  --t3: rgba(255,255,255,.28);
+}
+
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html,body { height:100%; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--t1);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  cursor: none;
+  transition: background .8s var(--ease), color .8s;
+}
+
+/* ─── CURSOR ────────────────────────── */
+#cur {
+  position:fixed; z-index:9999; pointer-events:none;
+  width:9px; height:9px; border-radius:50%;
+  background: var(--accent);
+  transform:translate(-50%,-50%);
+  transition: width .2s var(--spring), height .2s var(--spring), background .6s;
+  box-shadow: 0 0 10px var(--acc-l);
+}
+#cur.big { width:14px; height:14px; }
+#cur2 {
+  position:fixed; z-index:9998; pointer-events:none;
+  width:32px; height:32px; border-radius:50%;
+  border:1.5px solid var(--t3);
+  transform:translate(-50%,-50%);
+  transition: left .1s var(--ease), top .1s var(--ease), width .3s var(--spring), height .3s var(--spring), border-color .5s;
+}
+#cur2.xl { width:46px; height:46px; border-color:var(--accent); }
+
+/* ─── NEU COMPONENTS ────────────────── */
+
+/* Raised surface */
+.neu {
+  background: var(--bg);
+  box-shadow: var(--neu-out-md);
+  border-radius: var(--r);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
+
+/* Pressed inward (for inputs, inactive states) */
+.neu-in {
+  background: var(--bg);
+  box-shadow: var(--neu-in-md);
+  border-radius: var(--r);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
+
+/* Flat (no shadow, for nested elements) */
+.neu-flat {
+  background: var(--bg);
+  border-radius: 12px;
+  transition: background .8s;
+}
+
+/* ─── INIT OVERLAY ──────────────────── */
+.init {
+  position:fixed; inset:0; z-index:400;
+  background: var(--bg);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+  transition: opacity .7s var(--ease);
+}
+.init.gone { opacity:0; pointer-events:none; }
+
+.init-logo {
+  font-size: clamp(64px,14vw,120px);
+  font-weight:900; letter-spacing:-6px; line-height:1;
+  color: var(--t1);
+  text-shadow: var(--neu-out-lg);
+  transition: color .8s, text-shadow .8s;
+}
+.init-sub {
+  font-size:11px; font-weight:400;
+  letter-spacing:5px; text-transform:uppercase;
+  color: var(--t3); margin-bottom:8px;
+}
+
+/* Neumorphic search bar */
+.init-srch {
+  display:flex; align-items:center; gap:10px;
+  width:min(440px,88vw);
+  padding:8px 8px 8px 22px;
+  border-radius:50px;
+  box-shadow: var(--neu-in-md);
+  background: var(--bg);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
+.init-srch:focus-within {
+  box-shadow:
+    inset 6px 6px 14px var(--bg-d),
+    inset -6px -6px 14px var(--bg-l),
+    0 0 0 2px var(--accent);
+}
+.init-srch input {
+  flex:1; background:transparent; border:none; outline:none;
+  font-family:'Inter',sans-serif; font-size:14px; font-weight:300;
+  color:var(--t1); cursor:text;
+}
+.init-srch input::placeholder { color:var(--t3); }
+
+/* Neumorphic buttons */
+.btn-neu {
+  background: var(--bg);
+  box-shadow: var(--neu-out);
+  border:none; border-radius:50px;
+  padding:10px 24px;
+  font-family:'Inter',sans-serif;
+  font-size:12px; font-weight:600; letter-spacing:.8px;
+  color: var(--accent); cursor:none;
+  transition: box-shadow .2s var(--ease), transform .25s var(--spring), color .6s, background .8s;
+  white-space:nowrap;
+}
+.btn-neu:hover {
+  box-shadow: var(--neu-out-md);
+  transform: scale(1.04);
+}
+.btn-neu:active {
+  box-shadow: var(--neu-in);
+  transform: scale(.97);
+}
+
+.btn-ico {
+  background: var(--bg);
+  box-shadow: var(--neu-out);
+  border:none; border-radius:50%;
+  width:38px; height:38px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px; cursor:none; flex-shrink:0;
+  transition: box-shadow .2s var(--ease), transform .25s var(--spring), background .8s;
+}
+.btn-ico:hover { box-shadow: var(--neu-out-md); transform:scale(1.1); }
+.btn-ico:active { box-shadow: var(--neu-in); }
+
+.ispin {
+  display:none; width:22px; height:22px;
+  border:2px solid var(--bg-d); border-top-color:var(--accent);
+  border-radius:50%; animation:sp .65s linear infinite;
+}
+@keyframes sp { to { transform:rotate(360deg); } }
+
+/* ─── APP SHELL ─────────────────────── */
+.app {
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  padding:20px;
+  gap:14px;
+  max-width:1400px;
+  margin:0 auto;
+}
+
+/* ─── TOPBAR ────────────────────────── */
+.topbar {
+  display:flex; align-items:center; gap:16px;
+  padding:14px 28px;
+}
+.t-logo {
+  font-size:13px; font-weight:800; letter-spacing:7px; text-transform:uppercase;
+  color:var(--accent); transition:color .6s;
+  flex-shrink:0;
+}
+.t-sep { width:1px; height:22px; background:var(--bg-d); flex-shrink:0; }
+
+/* inline search (neumorphic) */
+.t-srch {
+  flex:1; max-width:360px; margin-left:auto;
+  display:flex; align-items:center; gap:8px;
+  padding:7px 7px 7px 18px; border-radius:50px;
+  box-shadow: var(--neu-in);
+  background: var(--bg);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
+.t-srch:focus-within {
+  box-shadow:
+    inset 5px 5px 12px var(--bg-d),
+    inset -5px -5px 12px var(--bg-l),
+    0 0 0 2px var(--accent);
+}
+.t-srch input {
+  flex:1; background:transparent; border:none; outline:none;
+  font-family:'Inter',sans-serif; font-size:13px; font-weight:300;
+  color:var(--t1); cursor:text; min-width:0;
+}
+.t-srch input::placeholder { color:var(--t3); }
+.tspin { display:none; width:18px; height:18px; border:1.5px solid var(--bg-d); border-top-color:var(--accent); border-radius:50%; animation:sp .65s linear infinite; flex-shrink:0; }
+
+.t-time {
+  flex-shrink:0; text-align:right; line-height:1.3;
+  padding-left:18px; border-left:1px solid var(--bg-d);
+}
+.t-hm { font-size:16px; font-weight:700; letter-spacing:-.5px; color:var(--t1); }
+.t-dt { font-size:10px; font-weight:300; color:var(--t3); margin-top:1px; }
+
+/* Live dot */
+.ldot {
+  width:8px; height:8px; border-radius:50%; flex-shrink:0;
+  background:var(--accent);
+  box-shadow:0 0 8px var(--acc-l);
+  animation:ldot 2.6s ease-in-out infinite;
+  transition:background .6s, box-shadow .6s;
+}
+@keyframes ldot { 50%{opacity:.3;transform:scale(.6);} }
+
+/* ─── MAIN GRID ─────────────────────── */
+.grid {
+  flex:1;
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap:14px;
+}
+
+/* ─── WEATHER CARD (left, spans 2 rows) */
+.wx-card {
+  grid-column:1;
+  grid-row:1/3;
+  padding:32px 30px;
+  display:flex; flex-direction:column;
+  gap:0; position:relative; overflow:hidden;
+}
+
+/* Subtle accent glow inside card — neumorphic inner highlight */
+.wx-card::before {
+  content:'';
+  position:absolute; top:20px; right:20px;
+  width:80px; height:80px; border-radius:50%;
+  background:radial-gradient(circle,var(--acc-l) 0%,transparent 70%);
+  opacity:.12; pointer-events:none;
+  transition:background .6s;
+}
+
+.wx-loc { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.wx-city { font-size:18px; font-weight:700; letter-spacing:-.4px; color:var(--t1); }
+.wx-cc {
+  font-size:8px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--accent); padding:3px 9px; border-radius:6px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  transition:color .6s, box-shadow .6s, background .8s;
+}
+.wx-when { font-size:11px; font-weight:300; color:var(--t3); margin-bottom:28px; }
+
+/* Giant temp — neumorphic text shadow trick */
+.wx-big {
+  display:flex; align-items:flex-start; line-height:1;
+}
+.wx-tmp {
+  font-size:clamp(80px,10vw,110px);
+  font-weight:900; letter-spacing:-6px; line-height:.88;
+  color:var(--t1);
+  transition:color .8s;
+}
+.wx-unit {
+  font-size:26px; font-weight:200; color:var(--t3);
+  padding-top:12px; letter-spacing:0;
+  transition:color .8s;
+}
+
+/* Condition row */
+.wx-cond {
+  display:flex; align-items:center; gap:12px; margin-top:16px;
+}
+/* Neumorphic icon circle */
+.wx-ico-wrap {
+  width:48px; height:48px; border-radius:50%;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  transition:box-shadow .6s, background .8s;
+}
+.wx-ico { width:32px; height:32px; }
+.wx-desc { font-size:16px; font-weight:400; color:var(--t2); text-transform:capitalize; transition:color .8s; }
+.wx-feels { font-size:11px; font-weight:300; color:var(--t3); margin-top:5px; }
+
+/* Stat pills — neumorphic */
+.wx-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; }
+.chip {
+  display:flex; align-items:center; gap:7px;
+  padding:8px 14px; border-radius:50px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  font-size:12px; font-weight:500; color:var(--t2);
+  cursor:default;
+  transition:box-shadow .2s var(--ease), transform .25s var(--spring), background .8s, color .8s;
+}
+.chip:hover { box-shadow: var(--neu-out-md); transform:translateY(-2px); }
+.chip:active { box-shadow: var(--neu-in); transform:scale(.97); }
+.ch-i { font-size:14px; }
+
+/* Min/Feel/Max strip — neumorphic inset */
+.mmf {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  margin-top:auto; padding-top:24px;
+  border-top:1px solid var(--bg-d);
+}
+.mmf-i { display:flex; flex-direction:column; gap:4px; }
+.mmf-i:nth-child(2) { align-items:center; }
+.mmf-i:nth-child(3) { align-items:flex-end; }
+.mmf-v { font-size:20px; font-weight:700; letter-spacing:-1px; color:var(--t1); transition:color .8s; }
+.mmf-l { font-size:8px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--t3); }
+
+/* ─── CENTER — LARGE DISPLAY ────────── */
+.center-card {
+  grid-column:2;
+  grid-row:1/3;
+  padding:36px 32px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:20px; text-align:center;
+}
+
+/* Huge centered temp with neumorphic circle behind */
+.cc-orb {
+  width:min(240px,26vw); height:min(240px,26vw);
+  border-radius:50%;
+  box-shadow:
+    18px 18px 40px var(--bg-d),
+    -18px -18px 40px var(--bg-l),
+    inset 4px 4px 12px var(--bg-d),
+    inset -4px -4px 12px var(--bg-l);
+  background:var(--bg);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:0; flex-shrink:0;
+  transition:box-shadow .6s var(--ease), background .8s;
+  animation:orbpulse 4s ease-in-out infinite;
+}
+@keyframes orbpulse {
+  0%,100% { box-shadow: 18px 18px 40px var(--bg-d), -18px -18px 40px var(--bg-l), inset 4px 4px 12px var(--bg-d), inset -4px -4px 12px var(--bg-l); }
+  50%     { box-shadow: 22px 22px 48px var(--bg-d), -22px -22px 48px var(--bg-l), inset 3px 3px 9px var(--bg-d), inset -3px -3px 9px var(--bg-l); }
+}
+.cc-big-tmp {
+  font-size:clamp(56px,8vw,92px);
+  font-weight:900; letter-spacing:-5px; line-height:.9;
+  color:var(--accent); transition:color .6s;
+}
+.cc-unit { font-size:22px; font-weight:200; color:var(--t3); margin-top:4px; }
+
+/* Accent label */
+.cc-label {
+  font-size:10px; font-weight:700; letter-spacing:4px; text-transform:uppercase;
+  color:var(--accent); transition:color .6s;
+}
+
+/* Neumorphic gauge bar */
+.cc-gauge-wrap {
+  width:100%; max-width:260px;
+}
+.cc-gauge-lbl {
+  display:flex; justify-content:space-between;
+  font-size:9px; font-weight:600; letter-spacing:2px;
+  text-transform:uppercase; color:var(--t3); margin-bottom:6px;
+}
+.cc-gauge-track {
+  height:6px; border-radius:6px;
+  box-shadow: var(--neu-in);
+  background:var(--bg); overflow:hidden;
+  transition:box-shadow .6s, background .8s;
+}
+.cc-gauge-fill {
+  height:100%; border-radius:6px;
+  background:linear-gradient(90deg,var(--acc-l),var(--accent));
+  transition:width 1.2s var(--ease), background .6s;
+}
+
+/* Sun/Moon rise set */
+.cc-sun-row {
+  display:flex; gap:16px; width:100%; max-width:280px;
+}
+.cc-sun-item {
+  flex:1; padding:14px 16px; border-radius:16px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; flex-direction:column; gap:4px;
+  align-items:center;
+  transition:box-shadow .6s, background .8s;
+}
+.csi-ico { font-size:20px; }
+.csi-lbl { font-size:8px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.csi-val { font-size:13px; font-weight:600; color:var(--t1); letter-spacing:-.3px; }
+
+/* UV + wind dir display */
+.cc-meta-row {
+  display:flex; gap:12px; width:100%; max-width:280px;
+}
+.cc-meta-item {
+  flex:1; padding:12px 14px; border-radius:14px;
+  box-shadow: var(--neu-in);
+  background:var(--bg);
+  display:flex; flex-direction:column; gap:3px;
+  transition:box-shadow .6s, background .8s;
+}
+.cmi-lbl { font-size:8px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.cmi-val { font-size:16px; font-weight:700; color:var(--accent); letter-spacing:-.5px; transition:color .6s; }
+
+/* ─── RIGHT CARD ────────────────────── */
+.right-card {
+  grid-column:3;
+  grid-row:1/3;
+  padding:28px 26px;
+  display:flex; flex-direction:column;
+  gap:0;
+}
+
+/* air quality widget */
+.aq-block {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:20px;
+}
+.aq-label { font-size:9px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--t3); margin-bottom:4px; }
+.aq-val { font-size:18px; font-weight:700; letter-spacing:-.5px; color:var(--t1); transition:color .8s; }
+.aq-dot { width:12px; height:12px; border-radius:50%; box-shadow:0 0 8px currentColor; transition:background .5s, box-shadow .5s; }
+
+/* Separator */
+.sep { height:1px; background:var(--bg-d); margin:16px 0; transition:background .8s; }
+
+/* Nearby cities */
+.nearby-lbl { font-size:9px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--t3); margin-bottom:12px; }
+.city-list { display:flex; flex-direction:column; gap:8px; }
+.nci {
+  display:flex; align-items:center;
+  padding:12px 16px; border-radius:14px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  cursor:default;
+  transition:box-shadow .2s var(--ease), transform .25s var(--spring), background .8s;
+}
+.nci:hover { box-shadow:var(--neu-out-md); transform:translateX(4px); }
+.nci:active { box-shadow:var(--neu-in); }
+.nci-name { font-size:12px; font-weight:500; color:var(--t1); flex:1; transition:color .8s; }
+.nci-tmp { font-size:16px; font-weight:700; letter-spacing:-1px; color:var(--accent); margin:0 10px; transition:color .6s; }
+.nci-ico { font-size:18px; }
+
+/* Pressure & visibility detail */
+.detail-pair {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  margin-top:auto;
+}
+.det-item {
+  padding:14px 16px; border-radius:16px;
+  box-shadow: var(--neu-in);
+  background:var(--bg);
+  display:flex; flex-direction:column; gap:4px;
+  cursor:default;
+  transition:box-shadow .6s, background .8s;
+}
+.di-lbl { font-size:8px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.di-val { font-size:18px; font-weight:700; letter-spacing:-1px; color:var(--t1); transition:color .8s; }
+.di-unit { font-size:10px; font-weight:300; color:var(--t3); }
+
+/* ─── BOTTOM — FORECAST ─────────────── */
+.fc-card {
+  grid-column: 1 / -1;
+  padding:24px 28px;
+}
+.fc-eye { font-size:9px; font-weight:700; letter-spacing:3.5px; text-transform:uppercase; color:var(--t3); margin-bottom:18px; transition:color .8s; }
+.fc-row { display:flex; gap:10px; }
+.fc-item {
+  flex:1; min-width:80px;
+  padding:18px 12px; border-radius:18px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; gap:7px;
+  cursor:default;
+  transition:box-shadow .2s var(--ease), transform .3s var(--spring), background .8s;
+}
+.fc-item:hover { box-shadow: var(--neu-out-md); transform:translateY(-6px); }
+.fc-item:active { box-shadow: var(--neu-in); transform:scale(.97); }
+.fc-day { font-size:8px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.fc-ico-wrap {
+  width:40px; height:40px; border-radius:50%;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  transition:box-shadow .6s, background .8s;
+}
+.fc-ico { width:28px; height:28px; }
+.fc-hi { font-size:16px; font-weight:700; letter-spacing:-.5px; color:var(--t1); transition:color .8s; }
+.fc-lo { font-size:11px; font-weight:300; color:var(--t3); }
+
+/* Wave graph */
+.wave-wrap { margin-top:18px; padding-top:18px; border-top:1px solid var(--bg-d); }
+.wave-days { display:flex; justify-content:space-between; margin-bottom:5px; }
+.wd { text-align:center; }
+.wd-hi { font-size:9px; font-weight:600; color:var(--accent); transition:color .6s; }
+.wd-lo { font-size:8px; font-weight:300; color:var(--t3); }
+#waveC { width:100%; height:44px; display:block; }
+
+/* ─── TOAST ─────────────────────────── */
+.toast {
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+  padding:11px 24px; border-radius:50px;
+  box-shadow: var(--neu-out-md);
+  background:var(--bg);
+  border-left:3px solid #e05050;
+  font-size:12px; font-weight:500; color:#e05050;
+  display:none; z-index:999; white-space:nowrap;
+  animation:tin .3s var(--ease);
+}
+@keyframes tin { from{opacity:0;transform:translateX(-50%) translateY(10px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+
+/* ─── RESPONSIVE ─────────────────────── */
+@media(max-width:1100px){
+  .grid { grid-template-columns:1fr 1fr; }
+  .center-card { grid-column:2; grid-row:1; }
+  .right-card { grid-column:1/3; grid-row:2; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .fc-card { grid-column:1/3; }
+}
+@media(max-width:720px){
+  .grid { grid-template-columns:1fr; }
+  .wx-card { grid-column:1; grid-row:1; }
+  .center-card { grid-column:1; grid-row:2; }
+  .right-card { grid-column:1; grid-row:3; display:flex; }
+  .fc-card { grid-column:1; grid-row:4; }
+  .app { padding:14px; }
+  .topbar { padding:12px 18px; }
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- INIT OVERLAY -->
+<div class="init" id="initOv">
+  <div class="init-logo">SKYE</div>
+  <p class="init-sub">Live weather · minimal · precise</p>
+  <div class="init-srch">
+    <button class="btn-ico" id="iGeo">📍</button>
+    <input id="iInp" type="text" placeholder="Mumbai, Tokyo, New York..." autocomplete="off" spellcheck="false"/>
+    <button class="btn-neu" id="iGo">Search</button>
+  </div>
+  <div class="ispin" id="iSpin"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- APP -->
+<div class="app" id="appShell" style="display:none;">
+
+  <!-- TOPBAR -->
+  <header class="neu topbar">
+    <span class="t-logo">SKYE</span>
+    <div class="t-sep"></div>
+    <div class="t-srch">
+      <button class="btn-ico" id="tbGeo" style="width:30px;height:30px;box-shadow:none;">📍</button>
+      <input id="tbInp" type="text" placeholder="Search city..." autocomplete="off" spellcheck="false"/>
+      <div class="tspin" id="tSpin"></div>
+      <button class="btn-neu" id="tbGo" style="padding:7px 18px;">Search</button>
+    </div>
+    <div class="t-time">
+      <div class="t-hm" id="tHm">--:--</div>
+      <div class="t-dt" id="tDt">--</div>
+    </div>
+    <div class="ldot"></div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+
+    <!-- LEFT: Weather Info -->
+    <div class="wx-card neu">
+      <div class="wx-loc">
+        <span class="wx-city" id="wxCity">—</span>
+        <span class="wx-cc" id="wxCC">—</span>
+      </div>
+      <div class="wx-when" id="wxWhen">—</div>
+      <div class="wx-big">
+        <span class="wx-tmp" id="wxTmp">—</span>
+        <span class="wx-unit">°C</span>
+      </div>
+      <div class="wx-cond">
+        <div class="wx-ico-wrap"><img class="wx-ico" id="wxIco" src="" alt=""/></div>
+        <div>
+          <div class="wx-desc" id="wxDesc">—</div>
+          <div class="wx-feels" id="wxFeels">—</div>
+        </div>
+      </div>
+      <div class="wx-chips">
+        <div class="chip"><span class="ch-i">💧</span><span id="chH">—</span></div>
+        <div class="chip"><span class="ch-i">💨</span><span id="chW">—</span></div>
+        <div class="chip"><span class="ch-i">👁</span><span id="chV">—</span></div>
+        <div class="chip"><span class="ch-i">🌡</span><span id="chP">—</span></div>
+      </div>
+      <div class="mmf">
+        <div class="mmf-i"><div class="mmf-v" id="mmMin">—</div><div class="mmf-l">Min</div></div>
+        <div class="mmf-i"><div class="mmf-v" id="mmFl">—</div><div class="mmf-l">Feels</div></div>
+        <div class="mmf-i"><div class="mmf-v" id="mmMax">—</div><div class="mmf-l">Max</div></div>
+      </div>
+    </div>
+
+    <!-- CENTER: Orb Display -->
+    <div class="center-card neu">
+      <div class="cc-orb">
+        <span class="cc-big-tmp" id="ccTmp">—</span>
+        <span class="cc-unit">°C</span>
+      </div>
+      <div class="cc-label" id="ccLabel">—</div>
+      <div class="cc-gauge-wrap">
+        <div class="cc-gauge-lbl"><span>HUMIDITY</span><span id="gaugeVal">—</span></div>
+        <div class="cc-gauge-track"><div class="cc-gauge-fill" id="gaugeFill" style="width:0%"></div></div>
+      </div>
+      <div class="cc-sun-row">
+        <div class="cc-sun-item">
+          <span class="csi-ico">🌅</span>
+          <span class="csi-lbl">Sunrise</span>
+          <span class="csi-val" id="csSr">—</span>
+        </div>
+        <div class="cc-sun-item">
+          <span class="csi-ico">🌇</span>
+          <span class="csi-lbl">Sunset</span>
+          <span class="csi-val" id="csSs">—</span>
+        </div>
+      </div>
+      <div class="cc-meta-row">
+        <div class="cc-meta-item">
+          <span class="cmi-lbl">Wind</span>
+          <span class="cmi-val" id="ccWnd">—</span>
+        </div>
+        <div class="cc-meta-item">
+          <span class="cmi-lbl">Direction</span>
+          <span class="cmi-val" id="ccDir">—</span>
+        </div>
+        <div class="cc-meta-item">
+          <span class="cmi-lbl">Pressure</span>
+          <span class="cmi-val" id="ccPrs">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Nearby + Detail -->
+    <div class="right-card neu">
+      <div>
+        <div class="aq-block">
+          <div>
+            <div class="aq-label">Air Quality</div>
+            <div class="aq-val" id="aqVal">—</div>
+          </div>
+          <div class="aq-dot" id="aqDot"></div>
+        </div>
+        <div class="sep"></div>
+        <div class="nearby-lbl">Nearby Cities</div>
+        <div class="city-list" id="cityList">
+          <div class="nci"><span class="nci-name" style="color:var(--t3)">Loading...</span></div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="detail-pair">
+        <div class="det-item">
+          <div class="di-lbl">Visibility</div>
+          <div class="di-val" id="diVis">—</div>
+          <div class="di-unit">km</div>
+        </div>
+        <div class="det-item">
+          <div class="di-lbl">Cloud Cover</div>
+          <div class="di-val" id="diCld">—</div>
+          <div class="di-unit">%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: Forecast -->
+    <div class="fc-card neu">
+      <div class="fc-eye">5-Day Forecast</div>
+      <div class="fc-row" id="fcRow"></div>
+      <div class="wave-wrap">
+        <div class="wave-days" id="waveDays"></div>
+        <canvas id="waveC"></canvas>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* CONFIG */
+const KEY='49e9292ca08a1c7b6d62899698d144ff';
+const OWM='https://api.openweathermap.org/data/2.5';
+const NB=['Delhi','Pune','Bangalore','Hyderabad','Chennai'];
+
+/* MULTI-PROXY FETCH */
+async function owm(ep){
+  const url=`${OWM}/${ep}`;
+  const chk=s=>{if(s===401)throw new Error('API_KEY');if(s===404)throw new Error('NOT_FOUND');};
+  try{const r=await fetch(url,{signal:AbortSignal.timeout(5000)});chk(r.status);if(r.ok)return await r.json();}
+  catch(e){if(['API_KEY','NOT_FOUND'].includes(e.message))throw e;}
+  try{
+    const r=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(9000)});
+    if(r.ok){const w=await r.json();const d=JSON.parse(w.contents);if(d.cod===401||d.cod==='401')throw new Error('API_KEY');if(d.cod==='404'||d.cod===404)throw new Error('NOT_FOUND');return d;}
+  }catch(e){if(['API_KEY','NOT_FOUND'].includes(e.message))throw e;}
+  try{const r=await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(9000)});chk(r.status);if(r.ok)return await r.json();}
+  catch(e){if(['API_KEY','NOT_FOUND'].includes(e.message))throw e;}
+  throw new Error('NETWORK');
+}
+
+/* CURSOR */
+(function(){
+  const dot=document.getElementById('cur'),ring=document.getElementById('cur2');
+  let rx=0,ry=0;
+  addEventListener('mousemove',e=>{dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';});
+  (function l(){rx+=(parseFloat(dot.style.left||0)-rx)*.13;ry+=(parseFloat(dot.style.top||0)-ry)*.13;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(l);})();
+  document.querySelectorAll('a,button').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{dot.classList.add('big');ring.classList.add('xl');});
+    el.addEventListener('mouseleave',()=>{dot.classList.remove('big');ring.classList.remove('xl');});
+  });
+})();
+
+/* CLOCK */
+(function tick(){
+  const d=new Date(),h=String(d.getHours()%12||12).padStart(2,'0'),m=String(d.getMinutes()).padStart(2,'0'),ap=d.getHours()>=12?'PM':'AM';
+  document.getElementById('tHm').textContent=`${h}:${m} ${ap}`;
+  document.getElementById('tDt').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  setTimeout(tick,1000);
+})();
+
+/* THEME */
+const TM={Clear:'clear',Clouds:'clouds',Rain:'rain',Drizzle:'rain',Thunderstorm:'thunderstorm',Snow:'snow',Mist:'mist',Fog:'mist',Haze:'mist'};
+function theme(m){const h=new Date().getHours();document.body.className=(h>=20||h<6)?'wx-night':'wx-'+(TM[m]||'clear');}
+
+function aq(h){
+  if(h<45)return{t:'Excellent',c:'#2dc96a'};
+  if(h<65)return{t:'Good',c:'#6abf4a'};
+  if(h<80)return{t:'Moderate',c:'#e8c030'};
+  return{t:'Poor',c:'#e06040'};
+}
+function ico(m){return{Clear:'☀️',Clouds:'⛅',Rain:'🌧️',Drizzle:'🌦️',Thunderstorm:'⛈️',Snow:'❄️',Mist:'🌫️',Fog:'🌫️',Haze:'🌫️'}[m]||'🌤️';}
+
+/* COUNTER */
+function cnt(el,to){const t0=performance.now(),D=820;(function s(n){const p=Math.min((n-t0)/D,1);el.textContent=Math.round(to*(1-(1-p)**3));if(p<1)requestAnimationFrame(s);})(t0);}
+
+/* WAVE */
+function drawWave(data){
+  const cv=document.getElementById('waveC');
+  const pr=devicePixelRatio||1,W=cv.offsetWidth,H=44;
+  cv.width=W*pr;cv.height=H*pr;
+  const ctx=cv.getContext('2d');ctx.scale(pr,pr);
+  if(!data||data.length<2)return;
+  const hs=data.map(d=>d.hi),ls=data.map(d=>d.lo);
+  const all=[...hs,...ls],mn=Math.min(...all)-2,mx=Math.max(...all)+2;
+  const ty=t=>H-5-((t-mn)/(mx-mn))*(H-10),tx=i=>(i/(data.length-1))*(W-2)+1;
+  // Get accent color from CSS variable
+  const accent=getComputedStyle(document.body).getPropertyValue('--accent').trim()||'#4a90d9';
+  function wave(pts,col,w,fill){
+    ctx.beginPath();
+    pts.forEach((p,i)=>{if(i===0)ctx.moveTo(tx(i),ty(p));else{const cx=(tx(i-1)+tx(i))/2;ctx.bezierCurveTo(cx,ty(pts[i-1]),cx,ty(p),tx(i),ty(p));}});
+    if(fill){ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fillStyle=fill;ctx.fill();}
+    ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineJoin='round';ctx.stroke();
+  }
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,accent+'55');g.addColorStop(1,accent+'08');
+  wave(hs,accent,1.8,g);
+  wave(ls,getComputedStyle(document.body).getPropertyValue('--t3').trim()||'#8aa0b8',1,null);
+}
+
+/* PAINT */
+function paint(w,f){
+  theme(w.weather[0].main);
+  const fmt=t=>new Date(t*1000).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  const dir=d=>['N','NE','E','SE','S','SW','W','NW'][Math.round((d||0)/45)%8];
+
+  document.getElementById('wxCity').textContent=w.name;
+  document.getElementById('wxCC').textContent=w.sys.country;
+  document.getElementById('wxWhen').textContent=
+    new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})+
+    ' · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  cnt(document.getElementById('wxTmp'),Math.round(w.main.temp));
+  document.getElementById('wxIco').src=`https://openweathermap.org/img/wn/${w.weather[0].icon}@2x.png`;
+  document.getElementById('wxDesc').textContent=w.weather[0].description;
+  document.getElementById('wxFeels').textContent=`Feels like ${Math.round(w.main.feels_like)}°C`;
+  document.getElementById('chH').textContent=w.main.humidity+'%';
+  document.getElementById('chW').textContent=Math.round(w.wind.speed*3.6)+' km/h';
+  document.getElementById('chV').textContent=(w.visibility/1000).toFixed(1)+' km';
+  document.getElementById('chP').textContent=w.main.pressure+' hPa';
+  document.getElementById('mmMin').textContent=Math.round(w.main.temp_min)+'°';
+  document.getElementById('mmFl').textContent=Math.round(w.main.feels_like)+'°';
+  document.getElementById('mmMax').textContent=Math.round(w.main.temp_max)+'°';
+
+  // Center orb
+  cnt(document.getElementById('ccTmp'),Math.round(w.main.temp));
+  document.getElementById('ccLabel').textContent=w.weather[0].description.toUpperCase();
+  document.getElementById('gaugeVal').textContent=w.main.humidity+'%';
+  document.getElementById('gaugeFill').style.width=w.main.humidity+'%';
+  document.getElementById('csSr').textContent=fmt(w.sys.sunrise);
+  document.getElementById('csSs').textContent=fmt(w.sys.sunset);
+  document.getElementById('ccWnd').textContent=Math.round(w.wind.speed*3.6)+' km/h';
+  document.getElementById('ccDir').textContent=dir(w.wind.deg);
+  document.getElementById('ccPrs').textContent=w.main.pressure;
+
+  // Right card
+  const a=aq(w.main.humidity);
+  document.getElementById('aqVal').textContent=a.t;
+  document.getElementById('aqDot').style.background=a.c;
+  document.getElementById('aqDot').style.boxShadow=`0 0 8px ${a.c}`;
+  document.getElementById('diVis').textContent=(w.visibility/1000).toFixed(1);
+  document.getElementById('diCld').textContent=w.clouds?.all??'—';
+
+  loadNearby(w.name);
+
+  if(f){
+    const DAYS=['SUN','MON','TUE','WED','THU','FRI','SAT'],map={};
+    f.list.forEach(it=>{
+      const d=new Date(it.dt*1000),k=d.toDateString();
+      if(!map[k])map[k]={day:DAYS[d.getDay()],hi:[],lo:[],ico:it.weather[0].icon};
+      map[k].hi.push(it.main.temp_max);map[k].lo.push(it.main.temp_min);
+    });
+    const days=Object.values(map).slice(0,5);
+    const fr=document.getElementById('fcRow');fr.innerHTML='';
+    days.forEach(d=>{
+      const hi=Math.round(Math.max(...d.hi)),lo=Math.round(Math.min(...d.lo));
+      const el=document.createElement('div');el.className='fc-item';
+      el.innerHTML=`<div class="fc-day">${d.day}</div><div class="fc-ico-wrap"><img class="fc-ico" src="https://openweathermap.org/img/wn/${d.ico}.png"/></div><div class="fc-hi">${hi}°</div><div class="fc-lo">${lo}°</div>`;
+      fr.appendChild(el);
+    });
+    const allDays=Object.values(map).slice(0,7);
+    const wd=allDays.map(d=>({hi:Math.round(Math.max(...d.hi)),lo:Math.round(Math.min(...d.lo)),day:d.day}));
+    const wdEl=document.getElementById('waveDays');wdEl.innerHTML='';
+    wd.forEach(d=>{const el=document.createElement('div');el.className='wd';el.innerHTML=`<div class="wd-hi">${d.hi}°</div><div class="wd-lo">${d.lo}°</div>`;wdEl.appendChild(el);});
+    setTimeout(()=>drawWave(wd),80);
+  }
+
+  document.getElementById('appShell').style.display='flex';
+}
+
+async function loadNearby(ex){
+  const list=document.getElementById('cityList');
+  list.innerHTML='<div class="nci"><span class="nci-name" style="color:var(--t3)">Loading...</span></div>';
+  const cities=NB.filter(c=>c.toLowerCase()!==ex.toLowerCase()).slice(0,4);
+  const results=await Promise.all(cities.map(async c=>{try{return await owm(`weather?q=${c}&units=metric&appid=${KEY}`);}catch{return null;}}));
+  list.innerHTML='';
+  results.forEach(w=>{
+    if(!w)return;
+    const el=document.createElement('div');el.className='nci';
+    el.innerHTML=`<span class="nci-name">${w.name}</span><span class="nci-tmp">${Math.round(w.main.temp)}°</span><span class="nci-ico">${ico(w.weather[0].main)}</span>`;
+    list.appendChild(el);
+  });
+}
+
+/* SEARCH */
+async function search(city){
+  spin(true);
+  try{
+    const[w,f]=await Promise.all([
+      owm(`weather?q=${encodeURIComponent(city)}&units=metric&appid=${KEY}`),
+      owm(`forecast?q=${encodeURIComponent(city)}&units=metric&appid=${KEY}`)
+    ]);
+    localStorage.setItem('skye',city);
+    document.getElementById('tbInp').value=city;
+    paint(w,f);
+    document.getElementById('initOv').classList.add('gone');
+  }catch(e){
+    const m={'API_KEY':'⚠ API key not active — wait 10 min after signup.','NOT_FOUND':`City not found. Try "Mumbai".`,'NETWORK':'Network error. Check your connection.'};
+    showToast(m[e.message]||'Something went wrong.');
+  }finally{spin(false);}
+}
+async function searchCoords(la,lo){
+  spin(true);
+  try{
+    const[w,f]=await Promise.all([owm(`weather?lat=${la}&lon=${lo}&units=metric&appid=${KEY}`),owm(`forecast?lat=${la}&lon=${lo}&units=metric&appid=${KEY}`)]);
+    document.getElementById('tbInp').value=w.name;localStorage.setItem('skye',w.name);
+    paint(w,f);document.getElementById('initOv').classList.add('gone');
+  }catch{showToast('Location error.');}
+  finally{spin(false);}
+}
+
+function spin(v){['iSpin','tSpin'].forEach(id=>document.getElementById(id).style.display=v?'block':'none');}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(window._t);window._t=setTimeout(()=>t.style.display='none',5500);}
+function go(id){const v=document.getElementById(id).value.trim();if(v)search(v);else showToast('Enter a city name.');}
+function geoGo(){if(!navigator.geolocation)return showToast('Geolocation not supported.');navigator.geolocation.getCurrentPosition(p=>searchCoords(p.coords.latitude,p.coords.longitude),()=>showToast('Location denied.'));}
+
+document.getElementById('iGo').onclick=()=>go('iInp');
+document.getElementById('iInp').onkeydown=e=>{if(e.key==='Enter')go('iInp');};
+document.getElementById('iGeo').onclick=geoGo;
+document.getElementById('tbGo').onclick=()=>go('tbInp');
+document.getElementById('tbInp').onkeydown=e=>{if(e.key==='Enter')go('tbInp');};
+document.getElementById('tbGeo').onclick=geoGo;
+document.querySelectorAll('input').forEach(el=>el.style.cursor='text');
+
+const last=localStorage.getItem('skye');
+if(last){document.getElementById('iInp').value=last;search(last);}
+</script>
+</body>
+</html>
