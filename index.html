@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SKYE</title>
-<link rel="icon" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 /* ═══════════════════════════════════════════
@@ -18,36 +17,23 @@
    Pure tactile softness.
 ═══════════════════════════════════════════ */
 :root {
-  /* base surface — all elements match this */
-  --bg:      #e8eef6;
-  --bg-d:    #d1dae6;   /* darker shadow */
-  --bg-l:    #ffffff;   /* lighter highlight */
+  /* ── LIGHT MODE (default) ── */
+  --bg:   #e8eef5;
+  --bg-d: #c8d2de;
+  --bg-l: #ffffff;
 
-  /* neumorphic shadows (the magic) */
-  --neu-out: 
-    6px 6px 14px var(--bg-d),
-    -6px -6px 14px var(--bg-l);
-  --neu-out-md:
-    10px 10px 24px var(--bg-d),
-    -10px -10px 24px var(--bg-l);
-  --neu-out-lg:
-    16px 16px 36px var(--bg-d),
-    -16px -16px 36px var(--bg-l);
-  --neu-in:
-    inset 4px 4px 10px var(--bg-d),
-    inset -4px -4px 10px var(--bg-l);
-  --neu-in-md:
-    inset 6px 6px 16px var(--bg-d),
-    inset -6px -6px 16px var(--bg-l);
+  --neu-out:    6px 6px 14px var(--bg-d), -6px -6px 14px var(--bg-l);
+  --neu-out-md: 10px 10px 24px var(--bg-d), -10px -10px 24px var(--bg-l);
+  --neu-out-lg: 16px 16px 36px var(--bg-d), -16px -16px 36px var(--bg-l);
+  --neu-in:     inset 4px 4px 10px var(--bg-d), inset -4px -4px 10px var(--bg-l);
+  --neu-in-md:  inset 6px 6px 16px var(--bg-d), inset -6px -6px 16px var(--bg-l);
 
-  /* accent — one color only, used sparingly */
-  --accent:  #4a90d9;
-  --acc-l:   #72aee8;
-  --acc-d:   #2e6cb0;
+  --accent: #4a90d9;
+  --acc-l:  #72aee8;
+  --acc-d:  #2e6cb0;
 
-  /* text */
-  --t1: #1a2a3a;
-  --t2: #5a7290;
+  --t1: #18243a;
+  --t2: #52708e;
   --t3: #8aa0b8;
 
   --r: 20px;
@@ -55,23 +41,53 @@
   --spring: cubic-bezier(0.34,1.56,0.64,1);
 }
 
-/* Weather accent colors — subtle, not background */
-body.wx-clear        { --accent:#e8a020; --acc-l:#f0bc50; --acc-d:#c07810; }
-body.wx-clouds       { --accent:#6a8aaa; --acc-l:#8aaccb; --acc-d:#4a6a8a; }
-body.wx-rain         { --accent:#3a78b8; --acc-l:#5a98d8; --acc-d:#1a5898; }
-body.wx-thunderstorm { --accent:#5a4a9a; --acc-l:#7a6aba; --acc-d:#3a2a7a; }
-body.wx-snow         { --accent:#7ab8e8; --acc-l:#9ad0f8; --acc-d:#5a98c8; }
-body.wx-mist         { --accent:#7a9ab0; --acc-l:#9ab8cc; --acc-d:#5a7a90; }
+/* ── WEATHER ACCENTS ── */
+body.wx-clear        { --accent:#e8a020; --acc-l:#f5bc40; --acc-d:#c07810; }
+body.wx-clouds       { --accent:#5a7a9a; --acc-l:#7a9aba; --acc-d:#3a5a7a; }
+body.wx-rain         { --accent:#2e72b2; --acc-l:#4e92d2; --acc-d:#1a5292; }
+body.wx-thunderstorm { --accent:#6040a0; --acc-l:#8060c0; --acc-d:#402080; }
+body.wx-snow         { --accent:#5a98c8; --acc-l:#7ab8e8; --acc-d:#3a78a8; }
+body.wx-mist         { --accent:#6a8a9a; --acc-l:#8aaab8; --acc-d:#4a6a7a; }
 
-/* Night mode */
-body.wx-night {
-  --bg:    #1e2836;
-  --bg-d:  #141c28;
-  --bg-l:  #28364a;
-  --t1: rgba(255,255,255,.90);
-  --t2: rgba(255,255,255,.50);
-  --t3: rgba(255,255,255,.28);
+/* ── SMOOTH TRANSITIONS for all neu elements ── */
+.neu, .neu-in, .neu-flat,
+.chip, .nci, .fc-item, .det-item,
+.wx-cc, .wx-ico-wrap, .cc-orb, .cc-sun-item,
+.cc-meta-item, .cc-gauge-track, .fc-ico-wrap,
+.init, .init-srch, .topbar {
+  transition:
+    background 1.4s cubic-bezier(0.4,0,0.2,1),
+    box-shadow 1.4s cubic-bezier(0.4,0,0.2,1),
+    border-color 1.4s cubic-bezier(0.4,0,0.2,1),
+    color 1.4s cubic-bezier(0.4,0,0.2,1) !important;
 }
+
+/* ── DARK MODE — proper charcoal neumorphism ── */
+body.dark {
+  /* Key: neutral warm-grey, NOT blue. 
+     Shadows must have enough contrast to show. */
+  --bg:   #23272f;   /* warm charcoal — the ONE base */
+  --bg-d: #16191f;   /* noticeably darker shadow     */
+  --bg-l: #2e333d;   /* noticeably lighter highlight */
+
+  --neu-out:    6px 6px 16px var(--bg-d), -6px -6px 16px var(--bg-l);
+  --neu-out-md: 10px 10px 26px var(--bg-d), -10px -10px 26px var(--bg-l);
+  --neu-out-lg: 16px 16px 38px var(--bg-d), -16px -16px 38px var(--bg-l);
+  --neu-in:     inset 4px 4px 10px var(--bg-d), inset -4px -4px 10px var(--bg-l);
+  --neu-in-md:  inset 6px 6px 16px var(--bg-d), inset -6px -6px 16px var(--bg-l);
+
+  --t1: rgba(235,240,248,0.95);
+  --t2: rgba(180,195,215,0.70);
+  --t3: rgba(140,160,185,0.45);
+}
+
+/* Dark + weather accent combo */
+body.dark.wx-clear        { --accent:#e8a020; --acc-l:#f5c050; --acc-d:#c07810; }
+body.dark.wx-clouds       { --accent:#7a9aba; --acc-l:#9abada; --acc-d:#5a7a9a; }
+body.dark.wx-rain         { --accent:#50a0e0; --acc-l:#70c0f8; --acc-d:#3080c0; }
+body.dark.wx-thunderstorm { --accent:#a080e0; --acc-l:#c0a0f8; --acc-d:#8060c0; }
+body.dark.wx-snow         { --accent:#90c8f0; --acc-l:#b0e0ff; --acc-d:#70a8d0; }
+body.dark.wx-mist         { --accent:#90a8b8; --acc-l:#b0c8d8; --acc-d:#708898; }
 
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
 html,body { height:100%; }
@@ -82,7 +98,9 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   cursor: none;
-  transition: background .8s var(--ease), color .8s;
+  transition: 
+    background 1.4s cubic-bezier(0.4,0,0.2,1),
+    color 1.4s cubic-bezier(0.4,0,0.2,1);
 }
 
 /* ─── CURSOR ────────────────────────── */
@@ -707,6 +725,16 @@ body {
   <!-- TOPBAR -->
   <header class="neu topbar">
     <span class="t-logo">SKYE</span>
+    <button id="darkToggle" onclick="toggleDark()" style="
+      background:var(--bg);
+      box-shadow:var(--neu-out);
+      border:none; border-radius:50%;
+      width:34px; height:34px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:none; color:var(--accent);
+      transition:box-shadow .2s, background .8s, color .6s;
+      flex-shrink:0;
+    "><i data-lucide="moon" style="width:15px;height:15px;"></i></button>
     <div class="t-sep"></div>
     <div class="t-srch">
       <button class="btn-ico" id="tbGeo" style="width:30px;height:30px;box-shadow:none;"><i data-lucide="map-pin" style="width:14px;height:14px;"></i></button>
@@ -881,7 +909,71 @@ async function owm(ep){
 
 /* THEME */
 const TM={Clear:'clear',Clouds:'clouds',Rain:'rain',Drizzle:'rain',Thunderstorm:'thunderstorm',Snow:'snow',Mist:'mist',Fog:'mist',Haze:'mist'};
-function theme(m){const h=new Date().getHours();document.body.className=(h>=20||h<6)?'wx-night':'wx-'+(TM[m]||'clear');}
+/* ─── TIME-BASED AUTO THEME ENGINE ───
+   Day  (06:00–19:59) → time-day class  → warm orange base, amber accent
+   Night(20:00–05:59) → dark class      → charcoal base, blue accent
+   Manual toggle overrides for current session only.
+   ────────────────────────────────────── */
+
+let _manualOverride = false;   // user manually toggled this session
+let _currentWx = 'clear';      // track current weather
+
+function isNightTime() {
+  const h = new Date().getHours();
+  return h >= 20 || h < 6;
+}
+
+function applyTimeClasses(forceDark, forceLight) {
+  document.body.classList.remove('dark','time-day');
+  if (forceDark || (!forceLight && isNightTime())) {
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.add('time-day');
+  }
+  updateToggleIcon();
+}
+
+function updateToggleIcon() {
+  const isDark = document.body.classList.contains('dark');
+  const btn = document.getElementById('darkToggle');
+  if (!btn) return;
+  btn.innerHTML = isDark
+    ? '<i data-lucide="sun" style="width:15px;height:15px;"></i>'
+    : '<i data-lucide="moon" style="width:15px;height:15px;"></i>';
+  if (window.lucide) lucide.createIcons();
+}
+
+function theme(m) {
+  _currentWx = m;
+  const wx = 'wx-' + (TM[m] || 'clear');
+  const isDark = document.body.classList.contains('dark');
+  const isDay  = document.body.classList.contains('time-day');
+  // Rebuild classes: keep time class, update weather class
+  document.body.classList.remove(...Array.from(document.body.classList).filter(c=>c.startsWith('wx-')));
+  document.body.classList.add(wx);
+  if (!isDark && !isDay) applyTimeClasses(); // set time class if missing
+}
+
+function toggleDark() {
+  _manualOverride = true;
+  const isDark = document.body.classList.contains('dark');
+  // Toggle: if dark → go light (day), if light → go dark
+  applyTimeClasses(!isDark, isDark);
+  // Save manual pref for this session
+  sessionStorage.setItem('skye-mode', isDark ? 'day' : 'night');
+}
+
+// Auto-switch check every minute
+function scheduleAutoTheme() {
+  setInterval(() => {
+    if (_manualOverride) return; // respect manual override
+    const shouldBeDark = isNightTime();
+    const isDark = document.body.classList.contains('dark');
+    if (shouldBeDark !== isDark) {
+      applyTimeClasses();
+    }
+  }, 60000);
+}
 
 function aq(h){
   if(h<45)return{t:'Excellent',c:'#2dc96a'};
@@ -1057,7 +1149,12 @@ document.querySelectorAll('input').forEach(el=>el.style.cursor='text');
 
 const last=localStorage.getItem('skye');
 if(last){document.getElementById('iInp').value=last;search(last);}
-// Initial icon render for static icons
+
+// Apply time-based theme on load (no manual override yet)
+applyTimeClasses();
+scheduleAutoTheme();
+
+// Initial icon render
 if(window.lucide) lucide.createIcons();
 window.addEventListener('load', ()=>{ if(window.lucide) lucide.createIcons(); });
 </script>
