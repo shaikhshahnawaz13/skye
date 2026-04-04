@@ -1,0 +1,29 @@
+{
+  "name": "skye",
+  "version": "1.0.0",
+  "description": "Minimal neumorphic weather app with real-time forecasts",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "vite build && gh-pages -d dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/js",
+    "lint:fix": "eslint src/js --fix"
+  },
+  "devDependencies": {
+    "vite": "^5.2.0",
+    "vitest": "^1.5.0",
+    "@vitest/coverage-v8": "^1.5.0",
+    "eslint": "^8.57.0",
+    "jsdom": "^24.0.0",
+    "@vitest/ui": "^1.5.0",
+    "gh-pages": "^6.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

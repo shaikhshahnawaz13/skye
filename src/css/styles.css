@@ -1,0 +1,699 @@
+/* ═══════════════════════════════════════════
+   NEUMORPHISM DESIGN SYSTEM
+   
+   Core idea: one background color, elements
+   appear raised or pressed using two shadows —
+   light from top-left, dark from bottom-right.
+   
+   No gradients on cards. No cartoon elements.
+   Pure tactile softness.
+═══════════════════════════════════════════ */
+:root {
+  /* ── LIGHT MODE (default) ── */
+  --bg:   #e8eef5;
+  --bg-d: #c8d2de;
+  --bg-l: #ffffff;
+
+  --neu-out:    6px 6px 14px var(--bg-d), -6px -6px 14px var(--bg-l);
+  --neu-out-md: 10px 10px 24px var(--bg-d), -10px -10px 24px var(--bg-l);
+  --neu-out-lg: 16px 16px 36px var(--bg-d), -16px -16px 36px var(--bg-l);
+  --neu-in:     inset 4px 4px 10px var(--bg-d), inset -4px -4px 10px var(--bg-l);
+  --neu-in-md:  inset 6px 6px 16px var(--bg-d), inset -6px -6px 16px var(--bg-l);
+
+  --accent: #4a90d9;
+  --acc-l:  #72aee8;
+  --acc-d:  #2e6cb0;
+
+  --t1: #18243a;
+  --t2: #52708e;
+  --t3: #8aa0b8;
+
+  --r: 20px;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+  --spring: cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* ── WEATHER ACCENTS ── */
+body.wx-clear        { --accent:#e8a020; --acc-l:#f5bc40; --acc-d:#c07810; }
+body.wx-clouds       { --accent:#5a7a9a; --acc-l:#7a9aba; --acc-d:#3a5a7a; }
+body.wx-rain         { --accent:#2e72b2; --acc-l:#4e92d2; --acc-d:#1a5292; }
+body.wx-thunderstorm { --accent:#6040a0; --acc-l:#8060c0; --acc-d:#402080; }
+body.wx-snow         { --accent:#5a98c8; --acc-l:#7ab8e8; --acc-d:#3a78a8; }
+body.wx-mist         { --accent:#6a8a9a; --acc-l:#8aaab8; --acc-d:#4a6a7a; }
+
+/* ── SMOOTH TRANSITIONS for all neu elements ── */
+.neu, .neu-in, .neu-flat,
+.chip, .nci, .fc-item, .det-item,
+.wx-cc, .wx-ico-wrap, .cc-orb, .cc-sun-item,
+.cc-meta-item, .cc-gauge-track, .fc-ico-wrap,
+.init, .init-srch, .topbar {
+  transition:
+    background 1.4s cubic-bezier(0.4,0,0.2,1),
+    box-shadow 1.4s cubic-bezier(0.4,0,0.2,1),
+    border-color 1.4s cubic-bezier(0.4,0,0.2,1),
+    color 1.4s cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+/* ── DARK MODE — proper charcoal neumorphism ── */
+body.dark {
+  /* Key: neutral warm-grey, NOT blue. 
+     Shadows must have enough contrast to show. */
+  --bg:   #23272f;   /* warm charcoal — the ONE base */
+  --bg-d: #16191f;   /* noticeably darker shadow     */
+  --bg-l: #2e333d;   /* noticeably lighter highlight */
+
+  --neu-out:    6px 6px 16px var(--bg-d), -6px -6px 16px var(--bg-l);
+  --neu-out-md: 10px 10px 26px var(--bg-d), -10px -10px 26px var(--bg-l);
+  --neu-out-lg: 16px 16px 38px var(--bg-d), -16px -16px 38px var(--bg-l);
+  --neu-in:     inset 4px 4px 10px var(--bg-d), inset -4px -4px 10px var(--bg-l);
+  --neu-in-md:  inset 6px 6px 16px var(--bg-d), inset -6px -6px 16px var(--bg-l);
+
+  --t1: rgba(235,240,248,0.95);
+  --t2: rgba(180,195,215,0.70);
+  --t3: rgba(140,160,185,0.45);
+}
+
+/* Dark + weather accent combo */
+body.dark.wx-clear        { --accent:#e8a020; --acc-l:#f5c050; --acc-d:#c07810; }
+body.dark.wx-clouds       { --accent:#7a9aba; --acc-l:#9abada; --acc-d:#5a7a9a; }
+body.dark.wx-rain         { --accent:#50a0e0; --acc-l:#70c0f8; --acc-d:#3080c0; }
+body.dark.wx-thunderstorm { --accent:#a080e0; --acc-l:#c0a0f8; --acc-d:#8060c0; }
+body.dark.wx-snow         { --accent:#90c8f0; --acc-l:#b0e0ff; --acc-d:#70a8d0; }
+body.dark.wx-mist         { --accent:#90a8b8; --acc-l:#b0c8d8; --acc-d:#708898; }
+
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html,body { height:100%; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--t1);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  cursor: none;
+  transition: 
+    background 1.4s cubic-bezier(0.4,0,0.2,1),
+    color 1.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ─── CURSOR ────────────────────────── */
+#cur {
+  position:fixed; z-index:9999; pointer-events:none;
+  width:9px; height:9px; border-radius:50%;
+  background: var(--accent);
+  transform:translate(-50%,-50%);
+  transition: width .2s var(--spring), height .2s var(--spring), background .6s;
+  box-shadow: 0 0 10px var(--acc-l);
+}
+#cur.big { width:14px; height:14px; }
+#cur2 {
+  position:fixed; z-index:9998; pointer-events:none;
+  width:32px; height:32px; border-radius:50%;
+  border:1.5px solid var(--t3);
+  transform:translate(-50%,-50%);
+  transition: left .1s var(--ease), top .1s var(--ease), width .3s var(--spring), height .3s var(--spring), border-color .5s;
+}
+#cur2.xl { width:46px; height:46px; border-color:var(--accent); }
+
+/* ─── NEU COMPONENTS ────────────────── */
+
+/* Raised surface */
+.neu {
+  background: var(--bg);
+  box-shadow: var(--neu-out-md);
+  border-radius: var(--r);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
+
+/* Pressed inward (for inputs, inactive states) */
+.neu-in {
+  background: var(--bg);
+  box-shadow: var(--neu-in-md);
+  border-radius: var(--r);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
+
+/* Flat (no shadow, for nested elements) */
+.neu-flat {
+  background: var(--bg);
+  border-radius: 12px;
+  transition: background .8s;
+}
+
+/* ─── INIT OVERLAY ──────────────────── */
+.init {
+  position:fixed; inset:0; z-index:400;
+  background: var(--bg);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+  transition: opacity .7s var(--ease);
+}
+.init.gone { opacity:0; pointer-events:none; }
+
+.init-logo {
+  font-size: clamp(64px,14vw,120px);
+  font-weight:900; letter-spacing:-6px; line-height:1;
+  color: var(--t1);
+  text-shadow: var(--neu-out-lg);
+  transition: color .8s, text-shadow .8s;
+}
+.init-sub {
+  font-size:11px; font-weight:400;
+  letter-spacing:5px; text-transform:uppercase;
+  color: var(--t3); margin-bottom:8px;
+}
+
+/* Neumorphic search bar */
+.init-srch {
+  display:flex; align-items:center; gap:10px;
+  width:min(440px,88vw);
+  padding:8px 8px 8px 22px;
+  border-radius:50px;
+  box-shadow: var(--neu-in-md);
+  background: var(--bg);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
+.init-srch:focus-within {
+  box-shadow:
+    inset 6px 6px 14px var(--bg-d),
+    inset -6px -6px 14px var(--bg-l),
+    0 0 0 2px var(--accent);
+}
+.init-srch input {
+  flex:1; background:transparent; border:none; outline:none;
+  font-family:'Inter',sans-serif; font-size:14px; font-weight:300;
+  color:var(--t1); cursor:text;
+}
+.init-srch input::placeholder { color:var(--t3); }
+
+/* Neumorphic buttons */
+.btn-neu {
+  background: var(--bg);
+  box-shadow: var(--neu-out);
+  border:none; border-radius:50px;
+  padding:10px 24px;
+  font-family:'Inter',sans-serif;
+  font-size:12px; font-weight:600; letter-spacing:.8px;
+  color: var(--accent); cursor:none;
+  transition: box-shadow .2s var(--ease), transform .25s var(--spring), color .6s, background .8s;
+  white-space:nowrap;
+}
+.btn-neu:hover {
+  box-shadow: var(--neu-out-md);
+  transform: scale(1.04);
+}
+.btn-neu:active {
+  box-shadow: var(--neu-in);
+  transform: scale(.97);
+}
+
+.btn-ico {
+  background: var(--bg);
+  box-shadow: var(--neu-out);
+  border:none; border-radius:50%;
+  width:38px; height:38px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px; cursor:none; flex-shrink:0;
+  transition: box-shadow .2s var(--ease), transform .25s var(--spring), background .8s;
+}
+.btn-ico:hover { box-shadow: var(--neu-out-md); transform:scale(1.1); }
+.btn-ico:active { box-shadow: var(--neu-in); }
+
+.ispin {
+  display:none; width:22px; height:22px;
+  border:2px solid var(--bg-d); border-top-color:var(--accent);
+  border-radius:50%; animation:sp .65s linear infinite;
+}
+@keyframes sp { to { transform:rotate(360deg); } }
+
+/* ─── APP SHELL ─────────────────────── */
+.app {
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  padding:20px;
+  gap:14px;
+  max-width:1400px;
+  margin:0 auto;
+}
+
+/* ─── TOPBAR ────────────────────────── */
+.topbar {
+  display:flex; align-items:center; gap:16px;
+  padding:14px 28px;
+}
+.t-logo {
+  font-size:13px; font-weight:800; letter-spacing:7px; text-transform:uppercase;
+  color:var(--accent); transition:color .6s;
+  flex-shrink:0;
+}
+.t-sep { width:1px; height:22px; background:var(--bg-d); flex-shrink:0; }
+
+/* inline search (neumorphic) */
+.t-srch {
+  flex:1; max-width:360px; margin-left:auto;
+  display:flex; align-items:center; gap:8px;
+  padding:7px 7px 7px 18px; border-radius:50px;
+  box-shadow: var(--neu-in);
+  background: var(--bg);
+  transition: box-shadow .3s var(--ease), background .8s;
+}
+.t-srch:focus-within {
+  box-shadow:
+    inset 5px 5px 12px var(--bg-d),
+    inset -5px -5px 12px var(--bg-l),
+    0 0 0 2px var(--accent);
+}
+.t-srch input {
+  flex:1; background:transparent; border:none; outline:none;
+  font-family:'Inter',sans-serif; font-size:13px; font-weight:300;
+  color:var(--t1); cursor:text; min-width:0;
+}
+.t-srch input::placeholder { color:var(--t3); }
+.tspin { display:none; width:18px; height:18px; border:1.5px solid var(--bg-d); border-top-color:var(--accent); border-radius:50%; animation:sp .65s linear infinite; flex-shrink:0; }
+
+.t-time {
+  flex-shrink:0; text-align:right; line-height:1.3;
+  padding-left:18px; border-left:1px solid var(--bg-d);
+}
+.t-hm { font-size:16px; font-weight:700; letter-spacing:-.5px; color:var(--t1); }
+.t-dt { font-size:10px; font-weight:300; color:var(--t3); margin-top:1px; }
+
+/* Live dot */
+.ldot {
+  width:8px; height:8px; border-radius:50%; flex-shrink:0;
+  background:var(--accent);
+  box-shadow:0 0 8px var(--acc-l);
+  animation:ldot 2.6s ease-in-out infinite;
+  transition:background .6s, box-shadow .6s;
+}
+@keyframes ldot { 50%{opacity:.3;transform:scale(.6);} }
+
+/* ─── MAIN GRID ─────────────────────── */
+.grid {
+  flex:1;
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap:14px;
+}
+
+/* ─── WEATHER CARD (left, spans 2 rows) */
+.wx-card {
+  grid-column:1;
+  grid-row:1/3;
+  padding:32px 30px;
+  display:flex; flex-direction:column;
+  gap:0; position:relative; overflow:hidden;
+}
+
+/* Subtle accent glow inside card — neumorphic inner highlight */
+.wx-card::before {
+  content:'';
+  position:absolute; top:20px; right:20px;
+  width:80px; height:80px; border-radius:50%;
+  background:radial-gradient(circle,var(--acc-l) 0%,transparent 70%);
+  opacity:.12; pointer-events:none;
+  transition:background .6s;
+}
+
+.wx-loc { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.wx-city { font-size:18px; font-weight:700; letter-spacing:-.4px; color:var(--t1); }
+.wx-cc {
+  font-size:8px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--accent); padding:3px 9px; border-radius:6px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  transition:color .6s, box-shadow .6s, background .8s;
+}
+.wx-when { font-size:11px; font-weight:300; color:var(--t3); margin-bottom:28px; }
+
+/* Giant temp — neumorphic text shadow trick */
+.wx-big {
+  display:flex; align-items:flex-start; line-height:1;
+}
+.wx-tmp {
+  font-size:clamp(80px,10vw,110px);
+  font-weight:900; letter-spacing:-6px; line-height:.88;
+  color:var(--t1);
+  transition:color .8s;
+}
+.wx-unit {
+  font-size:26px; font-weight:200; color:var(--t3);
+  padding-top:12px; letter-spacing:0;
+  transition:color .8s;
+}
+
+/* Condition row */
+.wx-cond {
+  display:flex; align-items:center; gap:12px; margin-top:16px;
+}
+/* Neumorphic icon circle */
+.wx-ico-wrap {
+  width:48px; height:48px; border-radius:50%;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  transition:box-shadow .6s, background .8s;
+}
+.wx-ico { width:32px; height:32px; }
+.wx-desc { font-size:16px; font-weight:400; color:var(--t2); text-transform:capitalize; transition:color .8s; }
+.wx-feels { font-size:11px; font-weight:300; color:var(--t3); margin-top:5px; }
+
+/* Stat pills — neumorphic */
+.wx-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; }
+.chip {
+  display:flex; align-items:center; gap:7px;
+  padding:8px 14px; border-radius:50px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  font-size:12px; font-weight:500; color:var(--t2);
+  cursor:default;
+  transition:box-shadow .2s var(--ease), transform .25s var(--spring), background .8s, color .8s;
+}
+.chip:hover { box-shadow: var(--neu-out-md); transform:translateY(-2px); }
+.chip:active { box-shadow: var(--neu-in); transform:scale(.97); }
+.ch-i { display:flex; align-items:center; color:var(--accent); transition:color .6s; }
+
+/* Min/Feel/Max strip — neumorphic inset */
+.mmf {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  margin-top:auto; padding-top:24px;
+  border-top:1px solid var(--bg-d);
+}
+.mmf-i { display:flex; flex-direction:column; gap:4px; }
+.mmf-i:nth-child(2) { align-items:center; }
+.mmf-i:nth-child(3) { align-items:flex-end; }
+.mmf-v { font-size:20px; font-weight:700; letter-spacing:-1px; color:var(--t1); transition:color .8s; }
+.mmf-l { font-size:8px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--t3); }
+
+/* ─── CENTER — LARGE DISPLAY ────────── */
+.center-card {
+  grid-column:2;
+  grid-row:1/3;
+  padding:36px 32px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:20px; text-align:center;
+}
+
+/* Huge centered temp with neumorphic circle behind */
+.cc-orb {
+  width:min(240px,26vw); height:min(240px,26vw);
+  border-radius:50%;
+  box-shadow:
+    18px 18px 40px var(--bg-d),
+    -18px -18px 40px var(--bg-l),
+    inset 4px 4px 12px var(--bg-d),
+    inset -4px -4px 12px var(--bg-l);
+  background:var(--bg);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:0; flex-shrink:0;
+  transition:box-shadow .6s var(--ease), background .8s;
+  animation:orbpulse 4s ease-in-out infinite;
+}
+@keyframes orbpulse {
+  0%,100% { box-shadow: 18px 18px 40px var(--bg-d), -18px -18px 40px var(--bg-l), inset 4px 4px 12px var(--bg-d), inset -4px -4px 12px var(--bg-l); }
+  50%     { box-shadow: 22px 22px 48px var(--bg-d), -22px -22px 48px var(--bg-l), inset 3px 3px 9px var(--bg-d), inset -3px -3px 9px var(--bg-l); }
+}
+.cc-big-tmp {
+  font-size:clamp(56px,8vw,92px);
+  font-weight:900; letter-spacing:-5px; line-height:.9;
+  color:var(--accent); transition:color .6s;
+}
+.cc-unit { font-size:22px; font-weight:200; color:var(--t3); margin-top:4px; }
+
+/* Accent label */
+.cc-label {
+  font-size:10px; font-weight:700; letter-spacing:4px; text-transform:uppercase;
+  color:var(--accent); transition:color .6s;
+}
+
+/* Neumorphic gauge bar */
+.cc-gauge-wrap {
+  width:100%; max-width:260px;
+}
+.cc-gauge-lbl {
+  display:flex; justify-content:space-between;
+  font-size:9px; font-weight:600; letter-spacing:2px;
+  text-transform:uppercase; color:var(--t3); margin-bottom:6px;
+}
+.cc-gauge-track {
+  height:6px; border-radius:6px;
+  box-shadow: var(--neu-in);
+  background:var(--bg); overflow:hidden;
+  transition:box-shadow .6s, background .8s;
+}
+.cc-gauge-fill {
+  height:100%; border-radius:6px;
+  background:linear-gradient(90deg,var(--acc-l),var(--accent));
+  transition:width 1.2s var(--ease), background .6s;
+}
+
+/* Sun/Moon rise set */
+.cc-sun-row {
+  display:flex; gap:16px; width:100%; max-width:280px;
+}
+.cc-sun-item {
+  flex:1; padding:14px 16px; border-radius:16px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; flex-direction:column; gap:4px;
+  align-items:center;
+  transition:box-shadow .6s, background .8s;
+}
+.csi-ico { font-size:20px; }
+.csi-lbl { font-size:8px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.csi-val { font-size:13px; font-weight:600; color:var(--t1); letter-spacing:-.3px; }
+
+/* UV + wind dir display */
+.cc-meta-row {
+  display:flex; gap:12px; width:100%; max-width:280px;
+}
+.cc-meta-item {
+  flex:1; padding:12px 14px; border-radius:14px;
+  box-shadow: var(--neu-in);
+  background:var(--bg);
+  display:flex; flex-direction:column; gap:3px;
+  transition:box-shadow .6s, background .8s;
+}
+.cmi-lbl { font-size:8px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.cmi-val { font-size:16px; font-weight:700; color:var(--accent); letter-spacing:-.5px; transition:color .6s; }
+
+/* ─── RIGHT CARD ────────────────────── */
+.right-card {
+  grid-column:3;
+  grid-row:1/3;
+  padding:28px 26px;
+  display:flex; flex-direction:column;
+  gap:0;
+}
+
+/* air quality widget */
+.aq-block {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:20px;
+}
+.aq-label { font-size:9px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--t3); margin-bottom:4px; }
+.aq-val { font-size:18px; font-weight:700; letter-spacing:-.5px; color:var(--t1); transition:color .8s; }
+.aq-dot { width:12px; height:12px; border-radius:50%; box-shadow:0 0 8px currentColor; transition:background .5s, box-shadow .5s; }
+
+/* Separator */
+.sep { height:1px; background:var(--bg-d); margin:16px 0; transition:background .8s; }
+
+/* Nearby cities */
+.nearby-lbl { font-size:9px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--t3); margin-bottom:12px; }
+.city-list { display:flex; flex-direction:column; gap:8px; }
+.nci {
+  display:flex; align-items:center;
+  padding:12px 16px; border-radius:14px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  cursor:default;
+  transition:box-shadow .2s var(--ease), transform .25s var(--spring), background .8s;
+}
+.nci:hover { box-shadow:var(--neu-out-md); transform:translateX(4px); }
+.nci:active { box-shadow:var(--neu-in); }
+.nci-name { font-size:12px; font-weight:500; color:var(--t1); flex:1; transition:color .8s; }
+.nci-tmp { font-size:16px; font-weight:700; letter-spacing:-1px; color:var(--accent); margin:0 10px; transition:color .6s; }
+.nci-ico { width:22px; height:22px; display:flex; align-items:center; justify-content:center; color:var(--accent); transition:color .6s; }
+
+/* Pressure & visibility detail */
+.detail-pair {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  margin-top:auto;
+}
+.det-item {
+  padding:14px 16px; border-radius:16px;
+  box-shadow: var(--neu-in);
+  background:var(--bg);
+  display:flex; flex-direction:column; gap:4px;
+  cursor:default;
+  transition:box-shadow .6s, background .8s;
+}
+.di-lbl { font-size:8px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.di-val { font-size:18px; font-weight:700; letter-spacing:-1px; color:var(--t1); transition:color .8s; }
+.di-unit { font-size:10px; font-weight:300; color:var(--t3); }
+
+/* ─── BOTTOM — FORECAST ─────────────── */
+.fc-card {
+  grid-column: 1 / -1;
+  padding:24px 28px;
+}
+.fc-eye { font-size:9px; font-weight:700; letter-spacing:3.5px; text-transform:uppercase; color:var(--t3); margin-bottom:18px; transition:color .8s; }
+.fc-row { display:flex; gap:10px; }
+.fc-item {
+  flex:1; min-width:80px;
+  padding:18px 12px; border-radius:18px;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; gap:7px;
+  cursor:default;
+  transition:box-shadow .2s var(--ease), transform .3s var(--spring), background .8s;
+}
+.fc-item:hover { box-shadow: var(--neu-out-md); transform:translateY(-6px); }
+.fc-item:active { box-shadow: var(--neu-in); transform:scale(.97); }
+.fc-day { font-size:8px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--t3); }
+.fc-ico-wrap {
+  width:40px; height:40px; border-radius:50%;
+  box-shadow: var(--neu-out);
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--accent);
+  transition:box-shadow .6s, background .8s, color .6s;
+}
+.fc-ico { width:28px; height:28px; }
+.fc-hi { font-size:16px; font-weight:700; letter-spacing:-.5px; color:var(--t1); transition:color .8s; }
+.fc-lo { font-size:11px; font-weight:300; color:var(--t3); }
+
+/* Wave graph */
+.wave-wrap { margin-top:18px; padding-top:18px; border-top:1px solid var(--bg-d); }
+.wave-days { display:flex; justify-content:space-between; margin-bottom:5px; }
+.wd { text-align:center; }
+.wd-hi { font-size:9px; font-weight:600; color:var(--accent); transition:color .6s; }
+.wd-lo { font-size:8px; font-weight:300; color:var(--t3); }
+#waveC { width:100%; height:44px; display:block; }
+
+/* ─── TOAST ─────────────────────────── */
+.toast {
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+  padding:11px 24px; border-radius:50px;
+  box-shadow: var(--neu-out-md);
+  background:var(--bg);
+  border-left:3px solid #e05050;
+  font-size:12px; font-weight:500; color:#e05050;
+  display:none; z-index:999; white-space:nowrap;
+  animation:tin .3s var(--ease);
+}
+@keyframes tin { from{opacity:0;transform:translateX(-50%) translateY(10px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+
+/* ─── RESPONSIVE ─────────────────────── */
+@media(max-width:1100px){
+  .grid { grid-template-columns:1fr 1fr; }
+  .center-card { grid-column:2; grid-row:1; }
+  .right-card { grid-column:1/3; grid-row:2; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .fc-card { grid-column:1/3; }
+}
+
+/* Tablet */
+@media(max-width:720px){
+  .grid { grid-template-columns:1fr; gap:10px; }
+  .wx-card,.center-card,.right-card,.fc-card {
+    grid-column:1 !important; grid-row:auto !important;
+  }
+  .right-card { display:flex; flex-direction:column; }
+  .app { padding:10px; gap:10px; }
+  .topbar { padding:10px 14px; gap:10px; }
+  .t-srch { max-width:none; }
+}
+
+/* Mobile — full proper fix */
+@media(max-width:480px){
+  body { overflow-x:hidden; }
+  .app { padding:8px; gap:8px; }
+
+  /* Hide cursor ring on touch */
+  #cur,#cur2 { display:none; }
+
+  /* Topbar — stack search below logo */
+  .topbar {
+    flex-wrap:wrap;
+    padding:10px 12px;
+    gap:8px;
+    height:auto;
+  }
+  .t-sep { display:none; }
+  .t-srch {
+    order:3; flex:none; width:100%;
+    max-width:none; margin-left:0;
+  }
+  .t-time { margin-left:auto; }
+
+  /* Grid — strict single column */
+  .grid {
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .wx-card,.center-card,.right-card,.fc-card {
+    grid-column:1 !important;
+    grid-row:auto !important;
+    width:100%;
+  }
+
+  /* Weather card */
+  .wx-card { padding:22px 18px; }
+  .wx-city { font-size:16px; }
+  .wx-tmp { font-size:72px; letter-spacing:-4px; }
+  .wx-chips { gap:6px; }
+  .chip { padding:6px 11px; font-size:11px; }
+
+  /* Center orb card — compact */
+  .center-card { padding:22px 18px; gap:14px; }
+  .cc-orb {
+    width:160px; height:160px;
+  }
+  .cc-big-tmp { font-size:52px; letter-spacing:-3px; }
+  .cc-sun-row { max-width:100%; }
+  .cc-sun-item { padding:10px 12px; }
+  .cc-meta-row { max-width:100%; }
+  .cc-gauge-wrap { max-width:100%; }
+
+  /* Right card */
+  .right-card {
+    padding:20px 18px;
+    display:flex; flex-direction:column; gap:0;
+  }
+  .detail-pair { grid-template-columns:1fr 1fr; }
+
+  /* Forecast */
+  .fc-card { padding:18px 14px; }
+  .fc-row { gap:6px; overflow-x:auto; padding-bottom:4px; }
+  .fc-item { min-width:68px; padding:14px 8px; }
+  .fc-hi { font-size:14px; }
+
+  /* Init overlay */
+  .init-logo { font-size:clamp(48px,14vw,80px); letter-spacing:-4px; }
+  .init-srch { padding:6px 6px 6px 16px; }
+  .init-srch input { font-size:13px; }
+  .btn-neu { padding:8px 18px; font-size:11px; }
+
+  /* Wave */
+  .wave-days { flex-wrap:wrap; gap:2px; }
+  .wd { flex:1; min-width:40px; }
+
+  /* MMF strip */
+  .mmf { padding-top:18px; }
+  .mmf-v { font-size:17px; }
+
+  /* Toast */
+  .toast { width:88vw; white-space:normal; text-align:center; font-size:11px; }
+}
+
+/* ─── DARK TOGGLE (replaces inline style) ──────────────────────────── */
+.btn-dark-toggle {
+  width: 34px;
+  height: 34px;
+  color: var(--accent);
+  transition: box-shadow .2s, background .8s, color .6s;
+  flex-shrink: 0;
+}
