@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="google-site-verification" content="6j9tGTxK8JDa69bPUHsuyD6oh6TPamQ6l6CcIIrsZ84"/>
+  <meta name="description" content="Skye is a modern weather application that provides real-time forecasts, temperature insights, and clean visual analytics with a sleek and intuitive UI."/>
+  <title>SKYE</title>
+  <link rel="icon" href="/skye/favicon.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script type="module" crossorigin src="/skye/assets/index-D7CZQJc5.js"></script>
+  <link rel="stylesheet" crossorigin href="/skye/assets/index-CJn-1JYL.css">
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- INIT OVERLAY -->
+<div class="init" id="initOv">
+  <div class="init-logo">SKYE</div>
+  <p class="init-sub">Live weather · minimal · precise</p>
+  <div class="init-srch">
+    <button class="btn-ico" id="iGeo"><i data-lucide="map-pin" style="width:16px;height:16px;"></i></button>
+    <input id="iInp" type="text" placeholder="Mumbai, Tokyo, New York..." autocomplete="off" spellcheck="false"/>
+    <button class="btn-neu" id="iGo">Search</button>
+  </div>
+  <div class="ispin" id="iSpin"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- APP -->
+<div class="app" id="appShell" style="display:none;">
+
+  <!-- TOPBAR -->
+  <header class="neu topbar">
+    <span class="t-logo">SKYE</span>
+    <button id="darkToggle" class="btn-ico btn-dark-toggle">
+      <i data-lucide="moon" style="width:15px;height:15px;"></i>
+    </button>
+    <div class="t-sep"></div>
+    <div class="t-srch">
+      <button class="btn-ico" id="tbGeo" style="width:30px;height:30px;box-shadow:none;">
+        <i data-lucide="map-pin" style="width:14px;height:14px;"></i>
+      </button>
+      <input id="tbInp" type="text" placeholder="Search city..." autocomplete="off" spellcheck="false"/>
+      <div class="tspin" id="tSpin"></div>
+      <button class="btn-neu" id="tbGo" style="padding:7px 18px;">Search</button>
+    </div>
+    <div class="t-time">
+      <div class="t-hm" id="tHm">--:--</div>
+      <div class="t-dt" id="tDt">--</div>
+    </div>
+    <div class="ldot"></div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+
+    <!-- LEFT: Weather Info -->
+    <div class="wx-card neu">
+      <div class="wx-loc">
+        <span class="wx-city" id="wxCity">—</span>
+        <span class="wx-cc" id="wxCC">—</span>
+      </div>
+      <div class="wx-when" id="wxWhen">—</div>
+      <div class="wx-big">
+        <span class="wx-tmp" id="wxTmp">—</span>
+        <span class="wx-unit">°C</span>
+      </div>
+      <div class="wx-cond">
+        <div class="wx-ico-wrap" id="wxIcoWrap" style="color:var(--accent);"></div>
+        <div>
+          <div class="wx-desc" id="wxDesc">—</div>
+          <div class="wx-feels" id="wxFeels">—</div>
+        </div>
+      </div>
+      <div class="wx-chips">
+        <div class="chip"><span class="ch-i"><i data-lucide="droplets" style="width:13px;height:13px;"></i></span><span id="chH">—</span></div>
+        <div class="chip"><span class="ch-i"><i data-lucide="wind" style="width:13px;height:13px;"></i></span><span id="chW">—</span></div>
+        <div class="chip"><span class="ch-i"><i data-lucide="eye" style="width:13px;height:13px;"></i></span><span id="chV">—</span></div>
+        <div class="chip"><span class="ch-i"><i data-lucide="thermometer" style="width:13px;height:13px;"></i></span><span id="chP">—</span></div>
+      </div>
+      <div class="mmf">
+        <div class="mmf-i"><div class="mmf-v" id="mmMin">—</div><div class="mmf-l">Min</div></div>
+        <div class="mmf-i"><div class="mmf-v" id="mmFl">—</div><div class="mmf-l">Feels</div></div>
+        <div class="mmf-i"><div class="mmf-v" id="mmMax">—</div><div class="mmf-l">Max</div></div>
+      </div>
+    </div>
+
+    <!-- CENTER: Orb Display -->
+    <div class="center-card neu">
+      <div class="cc-orb">
+        <span class="cc-big-tmp" id="ccTmp">—</span>
+        <span class="cc-unit">°C</span>
+      </div>
+      <div class="cc-label" id="ccLabel">—</div>
+      <div class="cc-gauge-wrap">
+        <div class="cc-gauge-lbl"><span>HUMIDITY</span><span id="gaugeVal">—</span></div>
+        <div class="cc-gauge-track"><div class="cc-gauge-fill" id="gaugeFill" style="width:0%"></div></div>
+      </div>
+      <div class="cc-sun-row">
+        <div class="cc-sun-item">
+          <span class="csi-ico"><i data-lucide="sunrise" style="width:22px;height:22px;stroke:var(--accent);"></i></span>
+          <span class="csi-lbl">Sunrise</span>
+          <span class="csi-val" id="csSr">—</span>
+        </div>
+        <div class="cc-sun-item">
+          <span class="csi-ico"><i data-lucide="sunset" style="width:22px;height:22px;stroke:var(--accent);"></i></span>
+          <span class="csi-lbl">Sunset</span>
+          <span class="csi-val" id="csSs">—</span>
+        </div>
+      </div>
+      <div class="cc-meta-row">
+        <div class="cc-meta-item">
+          <span class="cmi-lbl">Wind</span>
+          <span class="cmi-val" id="ccWnd">—</span>
+        </div>
+        <div class="cc-meta-item">
+          <span class="cmi-lbl">Direction</span>
+          <span class="cmi-val" id="ccDir">—</span>
+        </div>
+        <div class="cc-meta-item">
+          <span class="cmi-lbl">Pressure</span>
+          <span class="cmi-val" id="ccPrs">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Nearby + Detail -->
+    <div class="right-card neu">
+      <div>
+        <div class="aq-block">
+          <div>
+            <div class="aq-label">Air Quality</div>
+            <div class="aq-val" id="aqVal">—</div>
+          </div>
+          <div class="aq-dot" id="aqDot"></div>
+        </div>
+        <div class="sep"></div>
+        <div class="nearby-lbl">Nearby Cities</div>
+        <div class="city-list" id="cityList">
+          <div class="nci"><span class="nci-name" style="color:var(--t3)">Loading...</span></div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="detail-pair">
+        <div class="det-item">
+          <div class="di-lbl">Visibility</div>
+          <div class="di-val" id="diVis">—</div>
+          <div class="di-unit">km</div>
+        </div>
+        <div class="det-item">
+          <div class="di-lbl">Cloud Cover</div>
+          <div class="di-val" id="diCld">—</div>
+          <div class="di-unit">%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: Forecast -->
+    <div class="fc-card neu">
+      <div class="fc-eye">5-Day Forecast</div>
+      <div class="fc-row" id="fcRow"></div>
+      <div class="wave-wrap">
+        <div class="wave-days" id="waveDays"></div>
+        <canvas id="waveC"></canvas>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
